@@ -1,0 +1,87 @@
+About loading and scoping:
+
+
+Loading and packages:
+	* For simplicity, we only want a single concept of "Page" or "Button"
+	* Apps must be able to customize these concepts
+	
+	
+	
+	
+	* A manifest file maps a concept ("page") to one or more implementation files:
+		- JS
+		- HTML template(s)
+		- CSS
+		- resources (eg: images)
+	* Loading a 'concept' will auto-load all of the necessary implementation files for you
+	* For runtime optimization, need some way to munge manifest so knows that things are already loaded
+	
+	
+	
+	* Hope manifest defines most basic things
+	* You can include pre-defined 'packages' (all in one directory) which adds more concepts + customizes
+	* App gets its own manifest which can add more + customize, which is pre-loaded from /app/app.manifest
+	
+	<app packages='pkg1,pkg2'>
+		...
+	</app>
+
+
+
+
+Scope heirarchy:
+	* Site / App / Page / Panel [/ Panel / Panel /...] / Control [/ Control / Control /...]
+	* Site/App/Page/Panel are "Controllers" ?
+		- when creating a controller, pass in name of children ala CreateMasterWidget()
+			so site can say   this.apps[blah], etc
+	* Each item has a specific "scope" object
+	* Access up the scope heirarchy is done ala "Scope Access" below
+
+
+Scope Access:
+	* We want items in the system to have simple, mutable access to their site heirarchy scope
+	
+	* These scopes fit well with prototype inheritance, as the scope of a page should inherit the
+		scope of its app, etc
+	
+	* In addition to site/app/page/panel, the scope will contain:
+		* user
+			? roles?
+		* preferences
+		* permissions
+		* etc
+	
+	* When objects are rooted in the heirarchy, we give them a "scope" variable
+				var it = new SomeThing();
+				it.scope = someScope;
+				
+	* The object can reference its scope objects via this variable, eg:
+				SomeThing.prototype.method = function() {
+					var app = this.scope.app;
+					...
+				}
+				
+	* In english, things which are only referenced by "the" (without an "of")
+		are implicitly taken from this.scope
+				put the app into myApp   ==>   var myApp = this.scope.app;
+	
+	* When adding a child, give it a clone of your scope with yourself in it at the appropriate place:
+				SomeThing.prototype.addChild = function(child) {
+					this.children.push(child);
+					child.scope = this.childScope;			<-- calls getter
+				}
+				SomeThing.prototype.getChildScope = function() {
+					if (!this._childScope) {
+						this._childScope = this.scope.clone();
+						this._childScope.<thing> = this;
+					}
+					return this._childScope;
+				}
+				
+	? Friendlier name?
+	? Call the "scope' object 'the'?  
+				var it = new Object();
+				it.the = someScope;
+				
+				it.the.app.alert("OK");		<==		call alert of the app with "OK"
+													tell the app to alert with "OK"

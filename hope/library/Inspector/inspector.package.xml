@@ -1,0 +1,7 @@
+<package name='Inspector'>
+	<files>
+		<styles url="Inspector.css" preload="true" />
+		<template url="Inspector.template" preload="true" />
+		<script url="Inspector.js" preload="true" />
+	</files>
+</package>

@@ -1,0 +1,150 @@
+Loading scheme
+
+NEEDS:
+	- impossible to do immediate load and do debugging (I think, check with Andy?)
+	- pre-load things from compiled files automatically w/out reloading
+	- specify resources incl. js, css in manifests, pre-load automatically
+	- some sort of url redirection so we're not fragile
+
+
+Package loading
+	- for each package, load "{package}/manifest.json" first
+	- then check /hope/cache/package.js for pre-compiled version of the package
+	- if not found, do preloads from manifest
+	- 
+	
+	
+
+
+Packages
+	- organize scripts/css into packages which can be dynamically loaded
+	- each package specifies a number of entries which have:
+		- url 		= url to load (local to package dir by default)
+		- name 		= concept this package is for, more than one thing can share a name
+		- preload	= true to pre-load these items when the package is loaded
+	- When other packages are loaded, they can add things to the global "name" space
+		this represents overlays in the original name
+	
+	- In manifest, things which are not pre-loaded must specify their dependencies
+		on OTHER things that are not preloaded in that package
+
+
+	- loading by name:
+		- when author says "load(<name>)", we load all resources associated with that name
+		- if the name has dependencies, we pre-load those as well
+		- if already loaded, check to make sure there are no new (unloaded) dependencies
+
+
+	- system supplied things and plugins are packages in "libraries" in the /hope/library/ dir
+	- load libraries with   Loader.loadLibrary("name");
+
+
+
+Caching
+	- We cache by package only
+	- Not all .js files in the package manifes must be in the cache file, 
+		generally only the "preload" things will be put in the cache
+		but your custom loader can do whatever it wants to
+	- ALL preloads in the manifest MUST be in the cache .js file
+	- For package "foo", we create files:
+			{hope}/cache/foo.js
+			{hope}/cache/foo.css
+	
+	- When we load a package:
+		- we load the manifest as normal
+		- we try to load script  "{hope}/cache/foo.js"
+			- if found, we assume that handles all of our preloads
+		- if that was not found, we load the preloads that the 
+
+
+Loading apps etc
+	ASSUME
+		- we do URL rewriting to map apps and packages (how? with php?)
+		- 'site' is XML file w/manifest of apps + scripts + css
+		- 'app' is XML file w/manifest of pages + scripts + css
+		- 'page' is XML file w/manifest of its panels + scripts + css
+		- 'skins' are templates+JS/css which we can instantiate quickly
+			and contain pieces of the page
+		- all skins within an app have compatible CSS (so we can switch them in and out)
+		
+		- assume we're loading:
+			http://mysite/gallery
+			
+			which corresponds to site "mysite" and app "gallery"
+		
+	INITIAL PAGE LOAD
+		- user navigates to: http://mysite/gallery
+		- browser loads index.html, which:
+			- loads Loader.js
+			- loads required packages
+			- loads site XML file:  mysite/site/index.xml
+				- site loads its required JS and CSS files
+			- loads app XML file:	mysite/gallery/index.xml
+				- app loads its required JS and CSS files
+				- this will typically include a skin file as well
+				- app figures out which is default page (index.page.xml) and loads that
+	
+	USER NAVIGATES TO OTHER PAGE IN SAME APP
+		- change location.hash to #pagename (for history back and forth)
+		- hide current page's top level stuff
+		- app figures out which is <pagename> page
+		- app loads <pagenames> top level stuff within 
+	
+	USER NAVIGATES TO A PAGE WE'VE SEEN ALREADY
+		- hide current page top-level thinger
+		- show old page's top-level thinger
+	
+	USER NAVIGATES TO ANOTHER APP
+		- change location to http://mysite/otherapp
+		- proceed from step 2 of INITIAL PAGE LOAD
+	
+
+	TOFIGURE:
+		- what is our caching granularity for site/app/etc?
+			- OK in cache mode to load a single file for:
+				- site
+				- app
+				- page
+				- skin
+			- would be nice to have a 'super' mode where we precache site/app/page/skin in one file
+			- we'll need to mix:
+				- JS
+				- xml
+				- CSS
+				- html templates
+				
+				which means a JS file which includes CSS and templates in it
+	
+	XML vs JS
+		- there are obvious speed benefits to dealing with JS
+			BUT I want to be able to mix HTML in there, 
+				and declarative coding in XML is more fun
+			SO I want to use XML as my main data format.
+		- pros
+			+ can embed HTML/templates/etc in directly
+			+ lots of XML editors out there
+			+ keeping JS and XML separate is not such a bad thing
+			+ I like the idea of having what's in the XML be actually what is saved
+				that way we can keep the messy implementation details completely
+				separate from the data format
+		
+		- cons
+			- we're crossing the DOM reflection boundary to get at the attribute values
+			- there's no native inheritance for attributes
+			- have to do type conversion on values from XML
+		
+		SO: seems to mean that we store XML, then convert each XML object 
+			to its JS equivalent as we use it
+		
+			- For known tag types, can just have a 'fromXML' method
+				- If we have getters for known attributes, 
+					they should auto-convert from strings to the proper format (or do splits, etc)
+
+				- setters for attributes should write to the XML representation as well
+					(and set 'dirty' on the element itself?)
+	
+			- For unkown tag types, create them as simple objects with no type conversion?
+				? default type rules?
+			
+			- Have (eventually) a 'compiled' mode where we only deal with the JS?
+				? Do I have to worry about that right now?

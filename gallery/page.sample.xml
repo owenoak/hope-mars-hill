@@ -1,0 +1,20 @@
+<page name='reader'>
+	<methods>
+	{
+		setName : function(value) {
+			this.asPage("PAGE-"+value);
+		}
+	}
+	</methods>
+	<panel name='panel1' layout='horizontal'>
+		<methods>
+		{
+			setName : function(value) {
+				this.name = "PANEL-"+value;
+			}
+		}
+		</methods>
+		<label>blah</label>
+		<field name='foo' value='blah'/>
+	</panel>
+</page>

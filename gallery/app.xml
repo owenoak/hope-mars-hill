@@ -1,0 +1,11 @@
+<app name="pictureThis" packages='hope,ui'>
+	<preload>
+		<script src='page.js'/>
+		<stylesheet src='page.css'/>
+		<theme name='purple'/>
+	</preload>
+	<pages>
+		<page name="gallery" default="true"/>
+		<page name="editor"/>
+	</pages>
+</app>

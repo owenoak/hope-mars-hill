@@ -1,0 +1,36 @@
+Going to and from app files
+
+NEEDS:
+	- need to be able to mix HTML with our custom tags
+	- would love to do this with namespaces
+	- need to put generated HTML into custom tags when taking over objects
+	- need to ignore generated HTML when saving
+
+	== must keep custom tags in the HTML so we can save the page
+
+
+Strategy:
+	- have a single <hope> custom tag, so you'd do:
+		<hope type='Button'>...</hope>
+		
+	- Content in a hope object that should not be saved should have save='false' in the parent hope object?
+	
+	- They can manipulate the page via the IDE or firebug all they want
+
+	- On save, we ignore all generated content (somehow)
+	
+
+HMMMM
+	 - if we assume that they are creating their content with a tool,
+	 	do we need to allow them to embed arbitrary HTML anywhere?
+	 - what if we give them an 'htmlContainer' object to put arbitrary HTML into
+	 	and we ignore it everywhere else?
+	 	
+	 ? how can we do skins?
+	 	- skin is a encompassing HTML container
+	 	- maybe it's an overlay and we locate the app pieces in the skin via id?
+	 	- don't need to allow them to edit the skin in the IDE (??)
+	
+	
+
+

@@ -1,0 +1,1 @@
+console.warn("Gallery app JS file loaded");

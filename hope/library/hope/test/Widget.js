@@ -1,0 +1,1 @@
+console.warn("Widget.js loaded");

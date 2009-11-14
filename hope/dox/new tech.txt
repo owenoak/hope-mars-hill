@@ -1,0 +1,394 @@
+New tech to take advantage of:
+
+FF 3.5
+	* offline cache/manifest			- https://developer.mozilla.org/en/Offline_resources_in_Firefox
+		- FF 3.5 has manifest, but has completely separate API than Google's
+	* text-shadow
+	* -moz-border-image					- https://developer.mozilla.org/en/CSS/-moz-border-image
+		- moz-border-image				(M 3.5)
+		- webkit-border-image			(S 3.0)
+	* CSS transorm						- https://developer.mozilla.org/en/CSS/-moz-transform
+		- moz-transform					(M 3.5)
+		- webkit-transform 				(S 3.1)
+	* CSS columns						- http://www.w3.org/TR/css3-multicol/
+		- moz-column-X					(M 1.5)
+		- webkit-column-X				(S 3.0)
+	* native query selectors			- https://developer.mozilla.org/En/DOM/Element.querySelector
+		- element.querySelector(sel)	(M 3.5, S ~2008)
+		- element.querySelectorAll(sel)	(M 3.5, S ~2008)
+	* mouse gestures					- https://developer.mozilla.org/En/DOM/Mouse_gesture_events
+	* Object.getPrototypeOf(it)			(M 3.5)
+	* object.isPrototypeOf(it)			(M 3.5?)
+	* Native JSON support				(M 3.5, S ???)
+	* Canvas text drawing				- https://developer.mozilla.org/en/Drawing_text_using_a_canvas
+		- fillText()					(M 3.5, S ???)
+		- strokeText()
+		- measureText()
+		- mozDrawText()
+		- mozPathText()
+		- mozTextAlongPath()
+	* Bounding rectangle				- https://developer.mozilla.org/en/DOM/element.getBoundingClientRect
+		- object.getBoundingClientRect()	(M 3, S ???)
+	* DOM Storage						- https://developer.mozilla.org/en/DOM/Storage
+		- sessionStorage.foo			(M 2+, S 4)
+		- localStorage.foo				(M 3.5)
+	* Worker threads					- https://developer.mozilla.org/En/Using_web_workers
+		- new Worker('file.js')			(M 3.5)
+		- importScripts('file.js')		(M 3.5, in worker thread, synchronous)
+		
+
+* DOM Element Prototypes
+	- element types:
+			Element, Html, Head, Link, Title, Meta, Base, IsIndex, Style, Body, 
+			Form, Select, OptGroup, Option, Input, TextArea, Button, 
+			Label, FieldSet, Legend, UList, OList, DList, 
+			Directory, Menu, LI, Div, Paragraph, Heading, Quote, 
+			Pre, BR, BaseFont, Font, HR, Mod, Anchor, 
+			Image, Object, Param, Applet, Map, Area, Script, 
+			Table, TableCaption, TableCol, TableSection, TableRow, TableCell, 
+			FrameSet, Frame, IFrame
+	- Element properties
+		- attributes
+		- baseURI
+		- childElementCount (3.5)
+		- childNodes
+		- children (3.5)
+		- classList (3.6 - boo)
+		- className
+		- clientHeight ("inner height" - incl pading, but not border, margin, h scrollbar)
+		- clientWidth ("inner width" - incl pading, but not border, margin, v scrollbar)
+		- clientLeft ("width of left border")
+		- clientTop ("width of top border")
+		- dir (LTR or RTL)
+		- firstChild
+		- firstElementChild (3.5)
+		- id
+		- innerHTML
+		- lang
+		- lastChild  (null if element has no children)
+		- lastElementChild (3.5)
+		- localName (local part of tag name)
+		- name (only for elements: anchor, applet, form, frame, iframe, image, input, map, meta, object, option, param, select and textarea)
+		- namespaceURI
+		- nextSibling
+		- nextElementSibling (3.5)
+		- nodeName (like tagName, works for non HTML elements)
+		- nodePrincipal (3.0 - security)
+		- nodeType		* Node.ELEMENT_NODE == 1
+						* Node.ATTRIBUTE_NODE == 2
+						* Node.TEXT_NODE == 3
+						* Node.CDATA_SECTION_NODE == 4
+						* Node.ENTITY_REFERENCE_NODE == 5
+						* Node.ENTITY_NODE == 6
+						* Node.PROCESSING_INSTRUCTION_NODE == 7
+						* Node.COMMENT_NODE == 8
+						* Node.DOCUMENT_NODE == 9
+						* Node.DOCUMENT_TYPE_NODE == 10
+						* Node.DOCUMENT_FRAGMENT_NODE == 11
+						* Node.NOTATION_NODE == 12
+		- nodeValue (text/ CDATA, Comment, PI nodes only)
+		- offsetHeight (px, "border box height" - incl border, v padding, h scrollbar)
+						for BODY, "total linear content height"
+		- offsetLeft (# of pixels from UL corner of element from offsetParent's offsetLeft)
+		- offsetParent
+		- offsetTop
+		- offsetWidth ("border-box width)
+		- ownerDocument
+		- parentNode
+		- prefix (namespace prefix)
+		- previousSibling
+		- previousElementSibling (3.5)
+		- scrollHeight (height of all content incl padding, no matter how much is overflown)
+		- scrollWidth (width of all content incl padding, no matter how much is overflown)
+		- scrollLeft (amount scrolled to left, 0 = no scroll)
+		- scrollTop
+		- spellcheck (2.0, "if true, spell checking is enabled by default for the text box")
+		- style
+					- element.style.cssText = "background:blue"		- overwrites previous styles
+					- element.style.cssText += "background:blue"	- overwrites bg, keeps other styles
+					- see:  https://developer.mozilla.org/en/DOM/CSS
+		- tabIndex
+		- tagName
+		- textContent (textual content of element and all descendants)
+		- title
+	Methods:
+		- addEventListener(type, listener, useCapture)
+			- set listener as function (not as string) to have "this" be the event element
+		- appendChild(node)
+		- blur() 		- removes keyboard focus
+		- click() 		- simulates a click
+		- cloneNode(deep)	- deep=true for contents including text
+							- use to clone in mini-frame ala powerpoint?)
+							- c.f. importNode() 
+		- compareDocumentPosition(otherNode) 		
+				- returns bitmask with:
+					DOCUMENT_POSITION_DISCONNECTED = 0x01;
+					DOCUMENT_POSITION_PRECEDING = 0x02;
+					DOCUMENT_POSITION_FOLLOWING = 0x04;
+					DOCUMENT_POSITION_CONTAINS = 0x08;
+					DOCUMENT_POSITION_CONTAINED_BY = 0x10;
+		- dispatchEvent(event) 	- give event to the node 
+								- see document.createEvent()
+		- focus()		- acquire keyboard focus
+		- getAttribute(name)
+		- getAttributeNS(namespace, name)
+		- getAttributeNode(name)
+		- getAttributeNodeNS(namespace, name)
+		- getBoundingClientRect()	- single rect which encloses all content
+		- getClientRects()  		- array of rects for each line
+		- getElementsByClassName()
+		- getElementsByTagName(name)
+		- getElementsByTagNameNS(namespace, name)
+		- getFeature(feature, version) ???
+		- getUserData(key) 		- returns data on node for key from element.setUserData()
+		- hasAttribute(name)
+		- hasAttributeNS(namespace, name)
+		- hasAttributes() - true if has ANY attributes
+		- hasChildNodes() - true if has ANY child nodes
+		- insertBefore(newNode, existingChildNode)
+		- isDefaultNamespace(namespaceURI)
+		- isEqualNode(nodeArg) - ???
+		- isSameNode(otherNode) - ???
+		- isSupported(feature, version) - if node supports some DOM feature set
+		- lookupNamespaceURI(prefix)
+		- lookupPrefix(namespaceURL) 
+		- normalize() - clean up text nodes under this element (removes empty elements, merges adjacent)
+		- querySelector(selectors) - separate multiple selectors (for OR) in same string with comma
+		- querySelectorAll(selectors)
+		- removeAttribute(name)
+		- removeAttributeNS(namespace, name)
+		- removeAttributeNode(attrNode)
+		- removeChild(removedNode)
+		- removeEventListener(type, handler, capture)
+		- replaceChild(newNode, oldNode)
+		- scrollIntoView(alignWithTop)		- alignWithTop defaults true, false = align with bottom
+		- setAttribute(name, value)
+		- setAttributeNS(name, value)
+		- setAttributeNode(name, attrNode)
+		- setAttributeNodeNS(namespace, name, attrNode)
+		- prevData = setUserData(key, data, handler)
+				- prevData is what was formerly set under that key, or null
+				- data is not copied on clone(), importNode() or rename()
+				- re: handler, see: https://developer.mozilla.org/En/DOM/Node.setUserData
+	Events:
+		- oncopy
+		- oncut
+		- onpaste
+		- onbeforeunload
+		- onblur
+		- onchange
+		- onclick
+		- oncontextmenu
+		- ondblclick
+		- onfocus
+		- onkeydown
+		- onkeypress
+		- onkeyup
+		- onmousedown
+		- onmousemove
+		- onmouseout
+		- onmouseover
+		- onmouseup
+		- onresize
+		- onscroll
+		
+	(DOM events - cf: http://www.w3.org/TR/DOM-Level-3-Events/events.html#event-DOMFocusOut)
+		- DOMSubtreeModified
+		- DOMNodeInserted
+		- DOMNodeRemoved
+		- DOMNodeRemovedFromDocument
+		- DOMNodeInsertedIntoDocument
+		- DOMAttrModified
+		- DOMCharacterDataModified
+		- DOMElementNameChanged
+		- DOMAttributeNameChanged
+		- DOMActivate
+		- DOMFocusIn
+		- DOMFocusOut
+		- online (3.0) - cf: https://developer.mozilla.org/en/Online_and_offline_events
+		- offline (3.0)
+		
+		
+	(Gecko DOM events)
+		- DOMContentLoaded
+			- fired on window when DOM is loaded (not including images)
+		- DOMFrameContentLoaded
+			- same but for enclosed frame
+		- DOMWindowClose 
+			- fired on window just before window.close() completes
+		- MozAfterPaint 
+			- fires whenever content is repainted to doc, bubbles to window
+			- changing content can trigger an infinite loop
+		- DOMMouseScroll
+			- event.detail = # of 'ticks' mouse wheel moved; + = down/right, - = up/left
+			- event.axis (3.5) = e.HORIZONTAL_AXIS or e.VERTICAL_AXIS
+		- MozMousePixelScroll
+			- pixel scrolling, ala trackpads, same event attrs as DOMMouseScroll
+			- both DOMMouseScroll and MozMousePixelScroll are sent
+			- 
+		
+		
+
+Document Element Attributes
+	- document.activeElement  - currently focused element
+	- document.anchors - all anchors in the document
+	- document.applets
+	- document.async - see document.load()
+	- document.body - reference to BODY node
+	- document.characterSet
+	- document.compatMode - returns "BackCompat" for Quirks or "CSS1Compat" for Strict Mode
+	- document.contentType - MIME type
+	- document.cookie
+	- document.defaultView - reference to window
+	- document.designMode - set to "on" on HTML element to do inline editing in an iframe
+	- document.dir - ltr or rtl mdoe
+	- document.doctype - returns DTD of current doc
+	- document.documentElement - generally the HTML element
+	- document.documentURI - document location as a string
+	- document.domain  - can set to superdomain of the current value
+	- document.embeds - list of OBJECTS in document
+	- document.fileSize - size of the doc
+	- document.forms
+	- document.height - returns value in pixels
+	- document.images
+	- document.lastModified
+	- document.links
+	- document.location
+	- document.plugins - list of available plugins
+	- document.readyState (3.6 - BOO)
+	- document.referrer
+	- document.styleSheets
+	- document.title
+	- document.tooltipNode
+	- document.URL
+	- document.width
+	- document.xmlEncoding
+	- document.xmlVersion
+Document Methods:
+	- document.adoptNode(externalNode)
+		- remove node from another document and get it ready to add to our doc
+	- document.close()
+	- document.createAttribute()
+	- document.createCDATASection()
+	- document.createComment()
+	- document.createDocumentFragment()	- cf: https://developer.mozilla.org/En/DOM/DocumentFragment
+	- document.createElement()
+	- document.createEntityReference()
+	- document.createEvent()	- cf: https://developer.mozilla.org/en/DOM/document.createEvent
+	- document.createExpression()	- cf: https://developer.mozilla.org/en/XPathExpression
+	- document.createNSResolver()
+	- document.createProcessingInstruction()
+	- document.createRange()	- cf: https://developer.mozilla.org/en/DOM/range
+	- document.createTextNode()
+	- document.createTreeWalker()	- cf: https://developer.mozilla.org/en/DOM/treeWalker
+	- document.elementFromPoint(x, y) (3.0) - topmost element @ x/y local to window
+	- document.evaluate(xpath)
+	- document.execCommand() - for designMode
+	- document.getElementById()
+	- document.getElementsByClassName() (3.0)
+	- document.getElementsByName()
+	- document.getElementsByTagName()
+	- docuemnt.hasFocus()
+	- document.importNode(externalNode, deep)
+		- create a copy of a node from another document that can be re-rooted in our doc
+	- document.load() - load an XML document
+	- document.open()
+	- document.write()
+	- document.writeln()
+Document Event Handlers:
+	- document.ononline (3.0)
+	- document.onoffline (3.0)
+	- document.onreadystatechange (3.6)
+
+
+Window Properties:
+	- window.closed
+	- window.crypto - cf: https://developer.mozilla.org/en/JavaScript_crypto
+	- window.defaultStatus
+	- window.dialogArguments (3.0) - arguments passed to window in window.showModalDialog()
+	- window.document
+	- window.frameElement - parent OBJECT or IFRAME element
+	- window.frames - array of subframes
+	- window.fullscreen (3.6) - true if window is full screen
+	- window.history - cf: https://developer.mozilla.org/en/DOM/window.history 
+	- window.innerHeight - height of content area incl, horizontal scrollbar
+	- window.innerWidth - width of content area incl. vertical scrollbar
+	- window.lenght - number of frames in window
+	- window.location
+	- window.localStorage (3.5)
+	- window.name
+	- window.navigator
+	- window.opener
+	- window.outerHeight
+	- window.outerWidth
+	- window.pageXOffset (= window.scrollX)
+	- window.pageYOffset (= window.scrollY)
+	- window.parent - parent containing window object
+	- window.returnValue - return value to be provided to function which called showModalDialog()
+	- window.screen	- cf: https://developer.mozilla.org/en/DOM/window.screen
+	- window.scrollMaxX - max horizontal scroll amount (doc width - viewport width)
+	- window.scrollMaxY - max vertical scroll amount
+	- window.scrollX - # of pixels actually scrolled
+	- window.scrollY
+	- window.self - 
+	- window.sessionStorage
+	- window.status
+	- window.top - topmost window
+	- window.window
+	
+Window Methods
+	- alert()
+	- back() - go back in history
+	- blur() - set focus away from the window
+	- clearInterval()
+	- clearTimeout()
+	- close()
+	- confirm()
+	- escape()
+	- find(aString, aCaseSensitive, aBackwards, aWrapAround, aWholeWord, aSearchInFrames, aShowDialog) 
+		- find string in current window
+	- focus() - set focus on current window
+	- forward() - forward in history
+	- getComputedStyle(element)
+	- getSelection()
+	- home() - go to home page
+	- moveBy(x, y) - move by specified amount
+	- moveTo(t, l) - move to specific coords
+	- open(url, name, features)
+	- openDialog(url, name, features, args) - cf: https://developer.mozilla.org/en/DOM/window.openDialog
+	- postMessage() (3.0) - cf: https://developer.mozilla.org/en/DOM/window.postMessage
+	- print() - open print dialog
+	- prompt() - ask question and return response
+	- resizeBy()
+	- resizeTo()
+	- scroll() = window.scrollTo()
+	- scrollBy()
+	- scrollByLines()
+	- scrollByPages()
+	- scrollTo()
+	- setInterval()
+	- setTimeout()
+	- showModalDialog()	- cf: https://developer.mozilla.org/en/DOM/window.showModalDialog
+	- sizeToContent() - 
+	- stop() - stop loading
+	- unescape()
+
+Window Event Handlers
+	- onabort
+	- onbeforeunload
+	- onblur
+	- onchange
+	- onclose
+	- oncontextmenu
+	- ondragdrop
+	- onerror
+	- onfocus
+	- onload
+	- onreset
+	- onresize
+	- onscroll
+	- onselect
+	- onsubmit
+	- onunload
+	- 
+* NodeList element type

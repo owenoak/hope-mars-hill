@@ -1,0 +1,25 @@
+<html>
+<head>
+	<script src='/hope/Loader.js'></script>
+	<script src='testLoad.js'></script>
+</head>
+<body>
+<h1>Welcome to the Gallery!</h1>
+
+
+
+<div id='draggable' observes='dragstart drag dragstop' style='padding:10px; border:1px solid black'>
+	I am draggable
+	<div id='draggable-inside' observes='mousestilldown' style='width:200px;border:1px solid black'>I observe mousestilldown </div>
+</div>
+
+<br><br>
+
+<div id='hoverable' observes='hoverstart hover hoverstop' style='padding:10px; border:1px solid black'>
+	I am hoverable
+	<div id='hoverable_inside' style='width:200px;border:1px solid black'>And I am inside</div>
+</div>
+
+
+</body>
+</html>

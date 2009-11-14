@@ -1,0 +1,196 @@
+<TextField name='foo' style='blah' class='bar' validators='blah blah' length='30'/>
+
+function TextField(props, xml) {
+	if (xml) this.extendFromXML(xml);
+	if (props) this.extend(props);
+
+	// don't assign the xml representation til the end so we don't redundantly apply props to it on init
+	this.xml = xml;
+	
+	this.initialize();
+	this.initialized = true;
+}
+TextField.prototype = {
+	get name() {
+		return this.attributes.name;
+	},
+	set name(value) {
+		this.attributes.name = value;
+		if (this.xml) this.xml.set("name", value);
+	},
+	
+	get class() {},
+	set class() {},
+	
+	get validators() {},
+	set validators() {},
+	
+	get length(){
+		return this._length;
+	},
+	set length(value) {
+		this._length = parseInt(value);
+		if (this.xml) this.xml.set("length", value);
+	}
+}
+
+
+/*
+	NEEDS
+		- we want setters to massage values
+		- we want setters to write back to the XML if present 
+			- in edit mode only ???
+		- we want actual values to be stored somewhere AND inherited
+		- we want setter to (specially) be able to set the value without calling itself recursively
+		- it's very nice to just do get access as a property rather than as a function
+	
+	DESIRES
+		- want xml tag name to be lower case, class name to be upper case
+		
+	
+	OBSERVATIONS
+		- sets are pretty rare
+		- initial sets ("extend") are generally only once, on object creation
+	
+	
+	
+
+	STRATEGY
+		- we maintain separate XML, JS and DOM hierarchies
+		- each Class instance MAY have an associated XML object
+			if so, we maintain current values in public properties of that so we can export it later
+		- if instance has an HTML representation, that is "this.element" ("this.display"? "this.view"?)
+		- creation of nodes is done in a way that we can interrupt it,
+			for example, to load classes we haven't seen before
+		- we have a property which sets the name of the "childNodes" for this concept,
+				eg:  a menu has "menuItems" and not children
+			? use some sort of class creator thinger to make this work (ala MasterWidget)?
+			? just a 'childProperty' and getter/setter?
+			? have pointer to array (eg: "children" and use  children.setItem(...) ?
+	
+		- things which are rendered in the DOM:
+			- are all assumed to be borderBox (marginBox?)
+			- have a "draw" method (which can be deferred)  ("render"?)
+			- uses, eg, "width" for specifying their width, which can be conceptual like "full"
+			- uses "clientWidth" getter to get the actual, rendered width of their DOM node
+				- some way of knowing when clientWidth has been deferred so we can call again?
+				- exception when clientWidth is not knowable?
+	
+		- new Instance() takes either an XMLElement or Object as initializer
+			- if XMLElement
+				- apply all XMLElement attributes to this via "setX" methods
+				- remember the XMLElement as this.xml
+				- if XMLElement has child nodes, do "initChildNodes" with them
+				- do "initChildren" with the already-created child nodes
+				- initialize()
+			- if Object
+				- apply all Object properties via "setX" methods
+				- (forget Object)
+				- if Object has "children" property, do "initChildren" with them
+				- initialize()
+
+		- "setX" methods, will apply the value to this.xml if defined (always?)
+		- "initChildNodes" for an XMLElement will create Class instances automatically
+			from the XML child nodes
+		- "initChildren" for an Object will assume that the children are already
+			JS nodes (which may or may not have XML nodes) and just initialize them
+
+		- getters and setters
+			- 'attributes' are properties from our public API
+				which we can automatically load from our XML source
+			- we MUST have a setter for each public attribute
+			- we always use a "setX" or "set('x')" method to set 'attribute' values
+			- we always just get the value directly from the property
+				(and if the class/this instance needs a derived getter, 
+					that just works transparently -- 
+					think "trackMax" in the Slider where it's generally a number
+					but sometimes needs to be a derived function)
+
+			- 	function set(key, value) {
+					if (arguments.length == 1) {
+						var props = arguments[0];
+						for (var name in props) {
+							this.set(name, props[name]);
+						}
+					} else {
+						var setter = "set"+key.charAt(0).toUpperCase()+key.substr(1);
+						if (this[setter]) 	this[setter](value);
+						else				this[key] = value;
+					}
+				}
+
+
+		- setting up instance AND class prototype inheritance
+				function A(){console.log("new A")}; 
+				A.prototype = {a:"A"}; 
+				A.foo = "A foo";
+				function B(){console.log("new B")}; 
+				B.__proto__ = A; 
+				B.prototype = new A(); 
+				B.prototype.b = "B"; 
+				
+				new B()		=>  object with "a" and "b" properties
+				B.foo		=>  "A foo"
+				
+			
+		- superclass calling
+			- optimal syntax:
+					Super("foo", [args]);
+			- livable syntax:
+					this.<Class>("foo", [args])
+			STRATEGY
+				- for each Class/Mixin we inherit from, 
+					we get a function <Class> which takes
+					a method name and a list of arguments,
+					then does the call() for us
+				
+				MyClass.prototype = {
+					// (this is set up automatically in new Class() )
+					MyClass : function (method, args) {
+						return MyClass.protoype[method].apply(this, args);
+					},
+					...
+					someFunc : function(arg1, arg2) {
+						...
+						this.MySuperClass("someFunc", arguments);
+						...
+					}
+				}					
+				
+				
+				- for instance overrides, we have "Class(method,args)"
+				
+				- does this work properly with Mixins in all cases?
+					- mixin doesn't necessarily know who to delegate to?
+						- set it up when mixin is applied to the object?
+					- if mixins create their functions on the fly,
+						maybe they can get a "Super" property which they can call
+						which is the actual SuperClass of the class they're
+						installed in?
+
+					- mixin strategies:
+						- mixin is a proto object between Class.prototype and instance?
+						- mixin.apply creates functions which dynamically point to
+							the actual bound functions in Class.prototype at time of install?
+						- 
+					- NEEDS:
+						- don't really want to have to know WHO the super method is coming from
+							especially when a number of mixins appear in the middle
+						- Isomorphic found some way of doing super() calls - how?
+
+				- what if we make "MyClass" function a getter, 
+					then for each method in prototype we add caller methods?
+					syntax can maybe be:
+						this.MyClass.foo(arg1, arg2)
+				
+		- creating classes
+			- have "Class()" function which creates (and assigns globally) a new constructor
+				call as  	new Class("Foo", {instanceProps}, {classProps})
+				or			new Class({name:"Foo",superClass:Super, instanceProps:{...}, classProps:{...}});
+					- note that the "new Class" recipient is thrown away
+						what we're really dealing with is the window.Foo object
+			- if you can see constructor.__proto__, reassign that so your constructors
+				inherit as well.  If not, do an extend() on the constructor to have limited version of this.
+
+			- all classes inherit from "Class"
+			- all instances inherit from "Class.prototype"

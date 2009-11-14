@@ -1,0 +1,411 @@
+<docs>
+
+<class name='window'>
+	Extensions to the window object.  All can be accessed globally or as ^window.name^.
+
+	<method name='extend(it, source1, source2, ...)' tags='inheritance'>
+		Add all properties of one or more source objects to ^it^.
+		Correctly handles assignment of getters and setters.
+		<argument name='it'>Object to extend</argument>
+		<argument name='source' repeat='true'>One or more source objects with methods and properties to add to ^it^</argument>
+		<returns type='object'>Returns ^it^</returns>
+	</method>
+
+	<method name='uniquePropertiesOf(it)' tags='inheritance'>
+		Returns an object literaly with properties of ^it^ which are assigned directly to
+		^it^, ignoring properties inherited from its prototype.
+		Also ignores methods.
+		<argument name='it'>Object to get properties of</argument>
+		<returns type='object'>Object literal with non-method properties of ^it^ which are not
+			found on ^it^s prototype.
+		</returns>
+	</method>
+	
+	<method name='serialize(it)' tags='serialization'>
+		Serialize an object (of any type) to a string.
+		If ^it^ has a ^serialize()^ method, that will be called.
+		Otherwise converts to an escaped JSON string.
+		<argument name='it' type='any'>Thing to serialize</argument>
+		<returns type='string'>String representing that object.</returns>
+		<see what='window.deserialize()'>Use [[deserialize(string)]] to restore to the original object.</see>
+	</method>
+
+	<method name='deserialize(string)' tags='serialization'>
+		De-serialize a ^string^, turning it back into an object.
+		<note>Not every string can be deserialized, but this is guaranteed
+		to work on things which have previously been ^serialized()^.</note>
+		<argument name='string' type='String'>String to deserialize</argument>
+		<returns type='any'>Object representation of the string.</returns>
+		<throws>Error if string cannot be properly deserialized.</throws>
+		<see what='window.deserialize()'></see>
+	</method>
+	
+	<method name='setCookie(key, value, expires)' tags='cookie persistence'>Set a cookie.</method>
+	<method name='clearCookie(key)' tags='cookie serialization'>Clear a cookie</method>
+
+	<method name='rememember(key)' tags='persistence'>
+		Return persistently remembered value for ^key^.
+		<note>Uses ^localStorage^ concept which does not work for ^file://^ URLs.</note>
+		<see what='remember(key, value)'/>
+		<see what='forget(key)'/>
+	</method>
+	<method name='rememember(key, value)' tags='persistence'>
+		Persistently remember ^value^ for ^key^ across page reloads, browser sessions, etc.
+		<note>When values are ^remembered()^ they are converted to strings,
+			which means that if you store a non-string ^value^, the value on
+			subsequent calls to ^remember()^ will be different than your original value.
+		</note>
+		<note>Uses ^localStorage^ concept which does not work for ^file://^ URLs.</note>
+		<see what='remember(key)'/>
+		<see what='forget(key)'/>
+	</method>
+	<method name='forget(key)' tags='persistence'>
+		Forget a value that was previously ^remember()^ed.
+		<see what='remember(key)'/>
+		<see what='remember(key, value)'/>
+		<see what='forget(key)'/>
+	</method>
+	
+	<property name='HEAD' tags='DOM'>
+		A pointer to the ^^HEAD^^ element of the main page document, or
+		the ^^HTML^^ element if ^^HEAD^^ is not defined.
+	</property>
+
+	<property name='BODY' tags='DOM'>
+		A pointer to the ^^BODY^^ element of the main page document.
+	</property>
+	
+	<method name='select(selector, parent)' tags='DOM selectors'>
+		Return <b>first</b> element which match a CSS selector under ^parent^ element.
+		<note>If you pass an ^Element^ as the first argument, simply returns that.</note>
+		<argument name='selector' type='String or Element'>
+			If a String, CSS selector to search for.
+			If an Element subclass, just returns the element.
+		</argument>
+		<argument name='parent' optional='true' type='Element' default='document'>
+			Parent to search under.  If not passed, will look under document (eg: global search).
+		</argument>
+		<returns type='Element'>Returns matched element or null.</returns>
+		<see what='Element.select(selector)'/>
+		<see what='selectAll(selector, parent)'/>
+	</method>
+
+	<method name='selectAll(selector, parent)' tags='DOM selectors'>
+		Return <b>all</b> elements which match a CSS selector under ^parent^ element.
+		<argument name='selector' type='String'>
+			CSS selector to search for.
+		</argument>
+		<argument name='parent' optional='true' type='Element' default='document'>
+			Parent to search under.  If not passed, will look under document (eg: global search).
+		</argument>
+		<returns type='Element[]'>Array of matching elements.  
+			If none match, returns empty array.</returns>
+		<see what='Element.selectAll(selector)'/>
+		<see what='select(selector, parent)'/>
+	</method>
+	
+	<method name='append(element, parent)' tags='DOM'>
+		Append ^element^ to end of ^parent^'s children.
+		Removes ^element^ from its previous parent, if any.
+		<todo>Allow appendage of more than one element (by specifying a list?)</todo>
+		<argument name='element' type='Element'>Element to append.</argument>
+		<argument name='parent' type='String or Element' default='window.BODY'>
+			Parent element to append to.  
+			If specified as a string, parent will be first CSS element matched by ^select(parent)^.
+		</argument>
+		<returns type='Element'>Original element</returns>
+		<see what='element.append'/>
+	</method>
+	
+	<method name='create(tagName, extras)' tags='DOM'>
+		Convenient way to create a DOM element.
+		If ^extras^ is an object, it specifies attributes to apply to the new element.
+		Special attributes are as follows:
+		<ul>
+			<li>^extras.parent^ specifies a selector or element to be the new element's parentNode.</li>
+			<li>^extras.html^, ^extras.HTML^ or ^extras.innerHTML' specifies html to add to the new element.</li>
+		</ul>
+		<argument name='tagName' type='String'>Name of the tag for the new element</argument>
+		<argument name='extras' optional='true' type='String'>innerHTML for the new element</argument>
+		<argument name='extras' optional='true' type='Object'>Object of key:value pairs for the new element</argument>
+		<returns type='Element'>Newly created element</returns>
+		<see what='element.create(tagName, extras)'/>
+	</method>
+	
+	
+	<method name='load(url, async, callback, errback)' tags='IO load'>
+		Load a ^url^, calling ^callback^ with the response text.
+		<argument name='url' type='String'>Url to load</argument>
+		<argument name='async' type='Boolean' default='false'>If true, call will be asynchronous.</argument>
+		<argument name='callback' type='Function'>
+			Anonymous function to call with response text of load.
+			Called as:  ^callback(responseText, XMLHttpRequestObject)^.
+		</argument>
+		<argument name='errback' type='Function' optional='true'>
+			Anonymous function to call if request could not complete for any reason.
+			Called as:  ^errback(XMLHttpRequestObject)^.
+		</argument>
+	</method>
+	
+	<method name='loadFile(url, callback, errback)' tags='IO load'>
+		Synchronously load a file.
+		If ^callback^ is specified, returns ^callback(responseText)^.
+		If ^callback^ is not specified, returns ^responseText^.
+		<argument name='url' type='String'>Url to load</argument>
+		<argument name='callback' type='Function' optional='true'>
+			Anonymous function to call with response text of load.
+			Called as:  ^callback(responseText)^.
+		</argument>
+		<argument name='errback' type='Function' optional='true'>
+			Anonymous function to call if request could not complete for any reason.
+			Called as:  ^errback(XMLHttpRequestObject)^.
+		</argument>
+		<returns type='String'>Text of file (or results of ^callback(text)^ if ^callback^ was specified</returns>
+	</method>
+	
+	<method name='loadJSON(url)' tags='IO load'>
+		Synchronously load a file and return results as JSON.
+		<argument name='url' type='String'>Url to load</argument>
+		<returns type='Object'>Text of file run through ^JSON.parse()^.</returns>
+	</method>
+
+	<method name='loadScript(url, callback, errback)' tags='IO load'>
+		Synchronously load a script and execute it.
+		If ^callback^ is specified, passes file text to ^callback^ and returns the result.
+		If ^callback^ is not specified, ^eval^s response text.
+		<argument name='url' type='String'>Url to load</argument>
+		<argument name='callback' type='Function' optional='true'>
+			Anonymous function to call with response text of load.
+			Called as:  ^callback(responseText)^.
+		</argument>
+		<argument name='errback' type='Function' optional='true'>
+			Anonymous function to call if request could not complete for any reason.
+			Called as:  ^errback(XMLHttpRequestObject)^.
+		</argument>
+		<returns type='String'>Results of evaluation of file contents.</returns>
+	</method>
+	
+</class>
+
+
+<class name='Element'>
+	Extension to HTML Element objects.
+	
+	<method name='select(selector)' tags='DOM selectors'>
+		Return the first element underneath this element which matches CSS ^selector^.
+		<see what='selectAll(selector)'/>
+		<see what='window.select(selector, parent)'/>
+	</method>
+
+	<method name='selectAll(selector)' tags='DOM selectors'>
+		Return all elements underneath this element which match CSS ^selector^.
+		<see what='select(selector)'/>
+		<see what='window.selectAll(selector, parent)'/>
+	</method>
+	
+	<method name='append(element)'>
+		Append element as our last child.
+		<see what='window.append(element, parent)'/>
+	</method>
+
+	<method name='create(tagName, extras)'>
+		Create an element of specified ^tagName^ and ^extras^ and appends it as last child
+		of this element.
+		<see what='window.create(tagName, extras)'/>
+	</method>
+</class>
+
+
+<singleton name='Debug' tags='debugging'>
+	Provides facilities for setting/remembering debug flags.
+	Note that due to vagaries of how Fireug works, you must call ^console.X()^ methods directly,
+	so use the debug flags like so:
+	<example>
+		debug("Location");
+		...
+		Location.someMethod = function() {
+			...
+			// ERK: something went wrong!
+			debug.Location &amp;&amp; console.warn("Something went wrong");
+			...
+		}
+	</example>
+	<method name='set(topic, level, save)'>
+		Set a debug topic at a certain level.
+		<argument name='topic' type='String'>Name of the debug topic.</argument>
+		<argument name='level' type='String' default='off'>Debug level, one of:
+			<ul>
+				<li>^off^ = turn debugging off for this topic</li>
+				<li>^debug^ = show 'debug' level messages</li>
+				<li>^warn^ = show 'warn' level messages (also will expose 'debug' level messages)</li>
+				<li>^error^ = show 'error' level messages (and 'debug' and 'warn' level messages also)</li>
+			</ul>
+		</argument>
+		<argument name='save' type='boolean' optional='true' default='true'>
+			If true, we will save debug topics (via [[window.remember()]]) so they will be
+			the same when yoy reload the page.
+		</argument>
+	</method>
+	<method name='clear(topic)'>
+		Clear debug flags for ^topic^.
+	</method>
+	<method name='save()'>
+		Save the current debugging flags.  You should not need to call this directly.
+	</method>
+	<method name='load()'>
+		Load debug flags.  Called automatically as ^hope^ is initializing.
+	</method>
+
+	<see what='singleton:error'/>
+	<see what='singleton:warn'/>
+	<see what='singleton:debug'/>
+</singleton>
+
+<singleton name='error' tags='debugging'>
+	Accessor (and setter) for debug flags at 'error' level.
+	To see if we're debugging a particular topic at 'error' level, 
+	just check for the value of the topic on the global ^error^ object, eg:
+	<example>
+		error.Location &amp;&amp; console.error("Some problem with location");
+	</example>
+	You can also use ^error^ as a function to turn on error debugging for a particular topic:
+	<example>
+		error("Location");
+	</example>
+</singleton>
+
+<singleton name='warn' tags='debugging'>
+	Accessor (and setter) for debug flags at 'warn' level.
+	To see if we're debugging a particular topic at 'warn' level, 
+	just check for the value of the topic on the global ^warn^ object, eg:
+	<example>
+		warn.Location &amp;&amp; console.warn("Some problem with location");
+	</example>
+	<note>
+		You can also use ^warn^ as a function to turn on warn debugging for a particular topic:
+		<example>
+			warn("Location");
+		</example>
+	</note>
+	<note>Turning on 'warn' level debugging will cause 'error' level messages to be shown as well.</note>
+</singleton>
+
+<singleton name='debug' tags='debugging'>
+	Accessor (and setter) for debug flags at 'debug' level.
+	To see if we're debugging a particular topic at 'debug' level, 
+	just check for the value of the topic on the global ^debug^ object, eg:
+	<example>
+		debug.Location &amp;&amp; console.debug("Some problem with location");
+	</example>
+	<note>
+		You can also use ^debug^ as a function to turn on debug debugging for a particular topic:
+		<example>
+			debug("Location");
+		</example>
+	</note>
+	<note>Turning on 'debug' level debugging will cause 'error' and 'warn' 
+		level messages to be shown as well.</note>
+</singleton>
+
+
+
+<singleton name='cookie' tags='cookie persistence'>
+	Simplified ccessor for getting and manipulating browser cookies.
+	Access all defined cookie valies as ^cookie.foo^.
+	<note>Does not support cookies named 'set' or 'clear' -- if you need to use those,
+		manipulate ^document.cookie^ directly.</note>
+	<method name='cookie.set(key, value, expires)'>Alias to [[window.setCookie()]]</method>
+	<method name='cookie.clear(key)'>Alias to [[window.clearCookie()]]</method>
+</singleton>
+
+
+
+
+<class name='Location' tags='url'>
+	Location objects take in URLs and allow you to access the various parts of the URL
+	much as you can with the ^window.location^ object.
+	<br/>
+	All examples below assume you're starting with a url of:
+		^http://server.port/path/to/file.foo?p1=v1&amp;p2=v2#hash^
+
+	<see>String.prototype.asUrl</see>
+	<constructor>
+		<argument name='url' type='string'>URL to parse as the base of the new Location object.</argument>
+		Create an instance of Location based on URL passed in.
+		URL is normalized to remove any "./" and "../" path entries.
+	</constructor>
+	<property name='href' type='String'>http://server.port/path/to/file.foo?p1=v1&amp;p2=v2#hash</property>
+	<property name='fullpath' type='String'>http://server.port/path/to/</property>
+	<property name='prefix' type='String'>http://server:port</property>
+	<property name='protocol' type='String'>http:</property>
+	<property name='host' type='String'>server:port</property>
+	<property name='hostname' type='String'>server</property>
+	<property name='port' type='String'>port</property>
+	<property name='pathname' type='String'>/path/to/file.foo</property>
+	<property name='path' type='String'>/path/to/</property>
+	<property name='file' type='String'>file.foo</property>
+	<property name='filename' type='String'>file</property>
+	<property name='extension' type='String'>.foo</property>
+	<property name='search' type='String'>?p1=v1&amp;p2=v2</property>
+	<property name='hash' type='String'>#hash</property>
+	<property name='parameters' type='Object'>Returns an object of key:value pairs of the search parameters</property>
+	
+	<static name='urlParser' type='RegExp'>Regular expression used to parse URLs</static>
+</class>
+
+
+<class name='String'>
+	String object extensions
+	
+	<property name='asUrl' tags='url'>
+		Returns this string object transformed into a Location instance.
+	</property>
+	
+	<method name='normalizeUrl()' tags='url'>
+		Normalize a URL by resolving any "./" and "../" entries in its path.
+	</method>
+	
+	<method name='makeQuoteSafe()' tags='serialization'>
+		Returns a new string which is the same as this one, 
+		but which can safely be enclosed in single quotes.
+		<see what='makeDoubleQuoteSafe()'/>
+	</method>
+
+	<method name='makeDoubleQuoteSafe()' tags='serialization'>
+		Returns a new string which is the same as this one, 
+		but which can safely be enclosed in double quotes.
+		<see what='makeQuoteSafe()'/>
+	</method>
+	
+	<method name='tupelize(itemDelim, keyDelim, deserializeValues)' tags='serialization'>
+		Given a string of one or more sets of key:value pairs, returns an object
+		with the key:value pairs broken out.
+		<example>
+			"a=1&amp;b='2'".tupelize() ==> {a:1, b:'2'}
+		</example>
+		<argument name='itemDelim' type='String' default='&amp;'>Delimiter between tuple items.</argument>
+		<argument name='keyDelim' type='String' default='='>Delimiter between key:value pairs.</argument>
+		<argument name='keyDelim' type='Boolean' default='false'>If true, we will deserialize 
+			values before assigning to the return object.</argument>
+		<returns type='Object'>Object of key:value pairs from this string.</returns>
+	</method>
+	
+	<method name='trim()'>
+		Trim leading and trailing space from this string.
+		<note>Uses native browser implementation if provided.</note>
+	</method>
+</class>
+
+
+<class name='Object'>
+	Static methods added to Object.
+	
+	<static name="toArray(object, separator, quotify)" tags='serialization'>
+		Convert an object into an array of "key:value" strings.
+		<argument name='object' type='object'>Object to convert</argument>
+		<argument name='separator' type='string' default='""'>String to use to separate key:value in resulting array</argument>
+		<argument name='quotify' type='boolean' default='false'>If true, values will be made double quote safe</argument>
+		<returns type='String[]'>Array of strings, one for each key in object</returns>
+	</static>
+</class>
+</docs>

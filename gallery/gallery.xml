@@ -1,0 +1,5 @@
+<package name='gallery'>
+	<entries>
+		<script url="app.js" name='Gallery' preload="true" />
+	</entries>
+</package>

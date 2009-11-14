@@ -1,0 +1,18 @@
+<div id='Inspector' style='display:none'>
+	<div id='InspectorClose' onclick='Inspector.hide()'></div>
+	<table class='topTable'><tr>
+		<td class='Title'>Inspector</td>
+		<td class='show'>Show: <input class='subject' value='window' onchange='Inspector.inspect(this.value)'></td>
+		<td class='showInherited'>
+			<input type='checkbox' id='showInherited' #{? it.showInherited ? "CHECKED" : ""} onchange='Inspector.showInherited = this.checked;Inspector.refresh();'>
+			<label for='showInherited'>Show Inherited</label>
+		</td>
+		<td class='showMethods'>
+			<input type='checkbox' id='showMethods' #{? it.showInherited ? "CHECKED" : ""} onchange='Inspector.showMethods = this.checked;Inspector.refresh();'>
+			<label for='showMethods'>Show Methods</label>
+		</td>
+	</tr></table>
+	<div id='InspectorBody'>
+		<div id='InspectorDisplay'></div>
+	</div>
+</div>

@@ -1,0 +1,41 @@
+Data access
+
+	- DataSource 
+		- Abstracts a (set of) server call(s) to get a particular set of data
+		- At its most basic it is a URL which will yield a set of data (in XML or JS format)
+		- The DataSource instance manages the connection/persistant parameters, etc
+		- Usually there will be an encoding scheme whereby parameters can be passed
+			to the server, eg: query parameters in the URL
+		- Note that there may be some properties of the DS subclasses which are not 
+			fully defined until the first query (eg: DataList.count)
+		- API:  
+				- fetch(params)
+	
+	- DataList
+		- Subclass of array, manages a list of elements of some type
+		- Can have parameters which filter a larger list (eg: username or some query)
+		- Automatically handles paging, etc
+		- Users of DataList can assume that the list is in memory, 
+			and it will load rows in the background as appropriate
+			(eg: will display a 'loading' item for rows which aren't already loaded
+					and will replace with real data when it comes back, etc)
+		- API:
+			- count()						- # of items in actual list
+			- fetchSize  					- # of list items to fetch
+			- "fetchList(start[, end])" 	- fetch a number of list items
+	
+	
+	- DataSearch (?DataFilter?)
+		- Subclass of DataList with special options for running a paramaterized search
+		- 
+		
+	- DataTree
+		- Tree of items (with arbitrarily-named 'children' property)
+
+	
+	- DataMap (?)
+		- Map of key-> item?
+		
+	
+	- DataSuggest (name?)
+		- Encapsulates query used to implement a 'auto-complete' field

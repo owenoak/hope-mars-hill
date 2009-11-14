@@ -1,0 +1,186 @@
+What is HOPE v. 42
+------------------
+* Application development framework that is quick, convenient & fun to use
+* Development environment where you can lay out components, tweak the look & save on the fly
+* Set of smart widgets/app concepts you can use like building blocks to structure your app
+* Set of smart sample applications used for testing/tutorials, which can be extended for free
+* Global repository of apps / widgets / concepts w/ definitive instance of each concept
+	which you can auto-load into your application
+* Global app/component marketplace?
+* Global site(s) where everyone can host their programs  
+	(free?  create a platform & ISPs can compete on price?)
+* Auto-translation of UI components (labels, hints, sample values, etc) into other languages
+* Entire pages can be templated to build app in pieces automatically (ala Bento or Pages)
+* Makes all elements as tangible as possible to make them easy to work with
+* Has concept of dev/testing/live environments built in
+
+
+
+Why are we doing this?
+----------------------
+* Because writing in HTML/CSS/JS is too hard for most people
+* Because writing in HTML/CSS/JS is a PITA for even those who know how to do it
+* Integrating the IDE with the viewing platform is a lot more fun than tweaking numbers in a text file
+* Because I miss HyperCard and the fun of writing apps in it
+* Because I like writing app components & widgets & such
+
+
+Who is our target?
+------------------
+* Non-technical folks who want to create a 'real' application website
+* Business folks who want to create programs for their 
+* Interaction designers
+* Programmers who want their customers to be able to maintain their own programs
+
+
+How does it work?
+-----------------
+* Apps are expressed in a combination of XML & English - both highly readable by humans
+* Components are chunks of HTML + CSS + JS + PNGs
+* You can create any new tags you want (scoping?)
+* Use my unique perspective & experience to make a complete set of widgets/app concepts
+* Site / App / Panel / Control hierarchy, with implicit scoping (how?  mostly in the english?)
+* Decorate DOM elements rather than have separate JS and DOM representations?
+* Uses modern JS concepts like getters/setters
+* Components can be decorated to do interesting things (eg:  movable, resizable)
+? Auto-creation of DB tables/schema?  Assume data sources (or have separate process to create them?)
+
+
+
+What will make people start using it?
+-------------------------------------
+* Sample apps which they can customize
+* Template pages which adapt to your data source
+* Import an XLS file == instant application
+* Auto-translation extends the reach of your app
+
+
+
+What do we need to make it work?
+--------------------------------
+* Assume Moz/WebKit/ChromeFrame - no IE compatibility at all
+* Unit testing of low-level pieces, widgets & frameworks so we can ensure non-breakage
+* Understanding of DOM objects & their interactions (eg: what can we decorate, reflection speed, etc)
+* Take an XML file or other data source, convert to a tree via patterning
+
+
+How do we approach this design wise?
+------------------------------------
+* Create an object hierarchy w/capabilities - go for 90% case features
+* Create a couple of sample apps - address book, tasks, 
+* Write docs first?
+
+
+How do we approach this programming wise?
+-----------------------------------------
+* Do the parts we haven't done before FIRST
+	- makes it interesting
+	- even if we don't finish, have new stuff to show
+* Have abstract browser API, map to physical browsers @ low-level so we can think high-level
+	(eg:  <tag  ... round='small'>  which JustWorks)
+
+* English
+	- Get some basic JS objects working (like form package) so we have somewhat to start with
+	- Translation engine
+	
+* Low-level JS
+	- Remove all IE stuff from current HOPE
+	- Figure out what we're using of Prototype and extract/replicate that minimal set (?)
+	- Clean, simpler object system w/loading & introspection
+	- Unit testing framework
+	
+* Components
+	- Basic App / Site / Panel / Control framework w.scoping
+	- Form package (ala Gear6)
+	
+* IDE
+	- Docutron
+	- Rudimentary app editor / saver
+	- 'edit this thing' -> 
+	- Page organizer
+	- Layout editor
+
+
+What widgets do we provide?
+---------------------------
+* Panel
+* Toolbar
+* Label
+* Control / CompositeControl -- all controls can go in a list efficiently
+* Form
+* Button (w/many visual styles)
+* TextField / Select / Checkbox / Radio / MercurySwitch / etc
+* ListViewer  (List?)
+* TreeViewer  (Tree?)
+* Dialog / Window
+* TabBar / Tab
+* Menu (incl. context menu)
+* RepeatingSection (Repeat?)
+* Slider / RangeSlider
+* DateSelector
+* StyledText
+* Timer / RepeatingAction
+* Graph
+* TagCloud
+* Rating
+* InlineEditor
+* Organizer (list of things w/ add/delete/edit capability)
+* Image
+* PhotoEditor
+* ScriptEditor
+* BreadCrumb
+* ProgressBar
+* LoadingIndicator
+* Spacer
+* SpringSpacer
+
+
+What app concepts do we provide?
+--------------------------------
+* Site
+* App
+* Page
+* Panel
+* File / XMLFile / JSONFile / XLSFile / etc
+* DataSource (XML or JSON from a datasource)
+* ServerOperations (name?)
+* User
+* Role / Capability (ACL)
+* Preference
+* Payment
+* Spell checker
+* HTMLFrame
+* Skin
+* Template
+* Workflow
+* Email
+
+
+
+What sample apps do we provide?
+-------------------------------
+* Photo Gallery
+* Email
+* XLS -> App
+* RSS reader
+* Address book
+* Calendar (?)
+* Tasks
+
+
+Layout Semantics
+----------------
+* Page / Panel / Composite has a number of layout choices
+	- FlowLayout - everything flows as normal HTML
+	- Column - # of columns (incl. auto), things are layed out horizontally
+	- Rows - things are laid out in # of rows
+	- Grid - divide into grids/subgrids, elements have row & column indicators in XML
+
+
+Details
+-------
+* In script editor
+	- methods/properties arranged in groups (w/tags)
+	- you can see superclass methods while editing subclass
+* Site has a default set of resources you can include for free e.g. icons in HC.  Anything else?
+* Use the G6 Foo/Foos paradigm for getting at instances

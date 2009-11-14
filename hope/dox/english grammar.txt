@@ -1,0 +1,46 @@
+English usage/grammar:
+
+Rules:
+	* all methods (especially global ones) are verbs
+	* all properties are adjectives or nouns
+	* anything where you'd use an "of" is a dot relationship, eg:   foo.bar == [the] bar of foo
+	* it's OK to have lots of global methods as long as they:
+		* can work in any context
+		* can work on just about any object type, or
+		* are fundamental building blocks of structure (like "extend")
+	* make the JS code read like english
+	* classes are "Classes"
+	* Mixins are "Behaviors" (?)
+	? use "the" in front of a noun to disinguish it as a local member, eg:   thePage ?
+
+Specific teminology:
+	* "load" means load synchronously
+		- loadFile()			- load arbitrary file
+		- loadScript()			- load and interpret as script
+		- loadStylesheet()		- load and interpret as stylesheet
+		- 
+		
+		
+	* "include" means load in background
+
+
+Strategies:
+	* See 'scoping" strategy in 'loading and scoping.txt'
+	
+
+Instantiation / superclass strategy:
+	- the function rewiring Prototype does for super() is quite heinous
+	- need to do dependency preloading anyway (although I'm thinking that's synchronous now)
+	- it's confusing to have both the constructor and the prototype as separate objects
+	- SO....
+	
+	* Classes are globally accessable as window.Class
+	* Our Classes are actually the prototype objects, which have a .constructor
+	* Create instances with Class.create()
+	* In a subclass, you can call  Superclass.foo.apply(this, blah)
+		- unknown mixins can't slip in there... ?
+	* When loading a manifest, we can create bogus constructors for all Classes
+		that haven't been loaded, so we can do the Class.create() on them
+		before they've loaded -- that's pretty cool
+	
+	

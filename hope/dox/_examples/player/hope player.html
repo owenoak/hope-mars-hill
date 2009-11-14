@@ -1,0 +1,186 @@
+
+<html>
+<style>
+	* {
+		-moz-box-sizing:border-box;
+	}
+	
+	.round {
+		-moz-border-radius:1em;
+	}
+	
+	.rounded {
+		-moz-border-radius:50%;
+	}
+
+	.straight_top {
+		-moz-border-radius-topleft:0%;
+		-moz-border-radius-topright:0%;
+	}
+	
+	control {
+		position:absolute;
+		z-index:1000;
+	}
+	
+	container {
+		display:block;
+		background:black;
+		background:black;
+		padding:2em;
+	}
+
+	player {
+		display:block;
+		position:absolute;
+		left:100px;
+		top:20px;
+		background:blue;
+	}
+
+	movie {
+		display:block;
+		position:relative;
+		width:320px;
+		height:240px;
+		background:green;
+	}
+
+	toolbar {
+		display:block;
+		position:absolute;
+	}
+
+	action {
+		-moz-border-radius:50%;
+		width:2em;
+		height:2em;
+		background:red;
+		position:absolute;
+		color:white;
+		text-align:center;
+		line-height:200%;
+	}
+	
+	label {
+		color:white;
+	}
+	
+
+	knob {
+		display:block;
+		position:absolute;
+		width:3em;
+		height:3em;
+		background:black;
+		-moz-border-radius:1.5em;
+	}
+	
+
+	#top {
+	
+	}
+
+	.top {
+		position:absolute;
+		top:0%;
+	}
+	
+	
+	.bottom {
+		position: absolute;
+		bottom:0%;
+	}
+
+	toolbar#panel {
+		left:-1em;
+		right:-1em;
+		bottom:-61px;
+		height:60px;
+		background:darkgrey;
+	}
+
+	#comment {
+		width:80%;
+		background:pink;
+		height:20px;
+		left:20%;
+		width:60%;
+		height:60px;
+		bottom:-45px;
+	}
+
+	#search {
+		width:100%;
+		background:pink;
+		height:50px;
+		bottom:-20px;
+	}
+	
+
+	#info {
+	
+	}
+
+	#play {
+
+	}
+
+	#scenes {
+	
+	}
+	
+	#title {
+		left:10%;
+		width:40%;
+		text-align:center;
+	}
+	
+	#author {
+		right:10%;
+		width:40%;
+		text-align:center;
+	}
+	
+	knob#volume {
+		left:-2em;
+	}
+	
+	#full_screen {
+		right:-2em;
+	}
+
+	
+</style>
+<body>
+
+	<player class='round'>
+		<container class='round'>
+			<movie id='current'></movie>
+	
+			<toolbar id='panel' class='rounded straight_top'></toolbar>
+
+			<label id='title' class='top'>This Movie</label>
+			<label id='author' class='top'>The Authors</label>
+			<knob id='volume'></knob>
+			<knob id='full_screen'></knob>
+
+	<!--
+			<toolbar id='tabs' class='rounded'></toolbar>
+			<toolbar id='search'></toolbar>
+			<toolbar id='comment'></toolbar>
+			<toolbar id='info'></toolbar>
+			<toolbar id='scenes'></toolbar>
+			<action id='play'>&gt;</action>
+			<action id='pause'/>| |</action>
+			<action id='credits'/>=</action>
+			<action id='next_movie'/>-&gt;</action>
+			<action id='previous_movie'/>&lt;-</action>
+			<control id=''></control>
+			<control id=''></control>
+			<control id=''></control>
+	-->
+		</container>
+	</player>
+</body>
+</html>

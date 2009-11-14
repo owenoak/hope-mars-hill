@@ -1,0 +1,14 @@
+Making the DOM more fun:
+	- add methods to Element and NodeList to do interesting things
+		- animation
+		- class name manipulation
+		- array manipulation (filter, map, etc)
+		- mine Prototype and Dojo for more fun
+	- add methods to Event to make event management simpler
+		? can we support mouseenter/leave automatically?
+	
+	
+	
+HOW?
+	- in FF:  	modify Element and NodeList objects
+	- in WK:	modify Element and 

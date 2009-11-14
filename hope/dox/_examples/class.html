@@ -1,0 +1,323 @@
+<html>
+<body>
+<script>
+
+function dir(object) {
+	var properties = [],
+		methods = []
+	;
+	for (var prop in object) {
+		if (typeof object[prop] == "function") {
+			methods.push(prop + ": " + "function()");
+		} else {
+			properties.push(prop + ":" + object[prop]);
+		}
+	}
+	properties.sort();
+	methods.sort();
+	console.log(properties.join("\n") + "\n\n" + methods.join("\n"));
+}
+
+
+function extend(source, it) {
+	if (!it) it = this;
+	if (!source) return it;
+	for (var key in source) {
+		var getter = source.__lookupGetter__(key),
+			setter = source.__lookupSetter__(key)
+		;
+		if (getter || setter) {
+			if (getter) it.__defineGetter__(key, getter);
+			if (setter) it.__defineSetter__(key, setter);
+		} else {
+			var value = source[key];
+			it[key] = value;
+			// if we have an anonymous function, assign the key as the 'name'
+			//	this is required for asSuper() calls to work
+			if (typeof value == "function" && !value.name) value.name = key;
+		}
+	}
+	return it;
+}
+
+function setPrototype(dest, source) {
+	// if we can access the __proto__ property, use that to do a real prototype assignment
+	if (dest.__proto__) {
+		dest.__proto__ = source;
+
+	// otherwise copy the methods/properties
+	} else {
+		// TODO
+		console.warn("setProto():  setting proto not implemented when __proto__ not available");
+	}
+}
+
+
+/**  BEGIN CLASS **/
+
+(function() {		// hide from global scope
+	window.__constructingAClass__ = false;
+	// class creator syntax implementing the above
+	window.Class = function Class(attributes) {
+		if (window.__constructingAClass__) return;
+		
+		var className = attributes.name,
+			Super = attributes["super"] || Class
+		;
+		if (typeof Super != "function") Super = window[Super];
+	
+		// create the constructor and callSelf methods in eval for easier debugging
+		var constructor = _getConstructor(className, attributes.collection);
+
+		// have to constructor remember its class name
+		constructor.className = className;
+		constructor.superclass = Super;
+		
+		// set up the superclass (defaulting to Class if none provided)
+		// 	NOTE: use the global __constructingAClass__ flag to NOT call init on the superclass' prototype
+		// 			this is safe because all constructors are guaranteed to finish immediately
+		//			without calling anything else if this flag is set
+		window.__constructingAClass__ = true;
+		var prototype = constructor.prototype = new Super();
+		window.__constructingAClass__ = false;
+		// TODO: keep track of sub/superclasses?
+		
+		prototype["as"+className] = _getSelfCaller(className);
+		prototype.constructor = constructor;		// do I need to assign this?
+	
+		// set the __proto__ of the constructor to the superclass
+		//	this makes the constructor inherit methods/props from the superclass
+		setPrototype(constructor, Super);
+		
+		// if there are any mixin, add them now
+		if (attributes.mixin) {	
+			attributes.mixin.split(",").forEach(function(mixin) {
+				if (typeof mixin == "string") mixin = window[mixin];
+				var mixinName = mixin.name;
+				mixin.apply(constructor);
+			});
+		}
+	
+		// add instance and class defaults (methods and properties)
+		if (attributes.defaults) prototype.extend(attributes.defaults);
+		if (attributes.classDefaults) prototype.extend(attributes.classDefaults);
+	
+		// assign the constructor globally under the className
+		window[className] = constructor;
+	}
+	
+	// properties/methods available to all Classes (constructors)
+	extend({
+		className : "Class",
+	
+		// extend the constructor with methods/properties from 'source' object
+		// properly handles getters and setters
+		extend : extend,
+		toString : function toString() {
+			return "[Class "+this.className+"]";
+		}
+	
+	}, Class);
+	
+	// properties/methods applied to all SubClass instances
+	Class.prototype = {
+		// extend the constructor with methods/properties from 'source' object
+		// properly handles getters and setters
+		extend : extend,
+		
+		initialize : function initialize(attributes){
+			this.extend(attributes);
+		},
+		
+		toString : function toString() {
+			var name = (this == this.constructor.prototype ? "prototype" : this.id || this.name);
+			return "["+this.constructor.className+" "+name +"]";
+		}
+	
+	}
+	
+	
+	// Mixin constructor
+	// 	pass in attributes object with:
+	//		name				(required) name of the mixin
+	//		getDefaults() 		(optional) returns methods + properties to apply to the constructor.prototype
+	//		getClassDefaults()	(optional) returns methods + proeprties to apply to the constructor
+	//		initialize()		(optional) initialize the mixin itself (only called once)
+	//		apply(constructor)	(optional) apply this mixin to the constructor passed in
+	//
+	//	TODOC:		* how to do super calls in mixin methods (  this[asSuper]  )
+	//				* how to do a manual apply
+	//
+	//	NOTE:  I'm pretty sure that when two mixins override the same function
+	//				that the first one will be lost.  It may be possible to fix this
+	//				by getting a pointer to all of the methods actually returned in getDefaults()
+	//				as they are implemented AT THE TIME OF MIXIN INSTANTIATION
+	//				and having a different "this[asSuper]" syntax 
+	//				which goes directly to those functions
+	//				
+	//		
+	window.Mixin = function Mixin(attributes) {
+		extend(attributes, this);
+
+		// call the initializer for the mixin itself
+		if (this.initialize) this.initialize();
+		window[this.name] = this;
+	}
+	Mixin.prototype = {
+		apply : function apply(constructor) {
+			// get the defaults (methods+properties) to apply to the constructor
+			var defaults = this.getDefaults(constructor);
+			if (defaults) {
+				// actually add them to the constructor prototype
+				extend(defaults, constructor.prototype);
+				
+				// install a function which will call the mixin method
+				//	of the same name as the current method
+				//	NOTE:  'defaults' here MUST point to the actual methods
+				//			that will be installed in this object
+				//			(since they may be different for different calls to mixin.apply)
+				constructor.prototype["as"+this.name] = function callAs() {
+					var methodName = callAs.caller.name,
+						method = defaults[methodName]
+					;
+					if (method) method.apply(this, arguments);
+				}
+			}
+			
+			var classDefaults = this.getClassDefaults(constructor);
+			if (classDefaults) {
+				extend(constructor, classDefaults);
+			}
+		},
+		
+		getDefaults : function getDefaults(){},
+		getClassDefaults : function getClassDefaults() {},
+		
+		getSuperCaller : function(constructor) {
+			return "as"+constructor.superclass.className;
+		},
+		
+		asAMixin : _getSelfCaller("Mixin")
+	}
+	
+	
+	//
+	//	Utility functions
+	//
+
+	// return a class constructor
+	// NOTE: we construct the function with an eval() for ease of debugging
+	//			even though it's slightly less efficient
+	function _getConstructor(className, collection) {
+		eval("	var constructor = function "+className+"(){\
+						if (window.__constructingAClass__) return;\
+						this.initialize.apply(this, arguments);\
+						"+(collection ? collection+".add(this);" : "")+"\
+				}");
+		return constructor;
+	}
+
+	// return a function to call a method on this class name
+	// NOTE: we construct the function with an eval() for ease of debugging
+	//			even though it's slightly less efficient
+	function _getSelfCaller(className) {
+		eval("	var callSelf = function callAs"+className+"(){\
+					var methodName = callAs"+className+".caller.name;\
+					if (!methodName) throw 'In order to call superclass in this way, function must have a name';\
+					var method = "+className+".prototype[methodName];\
+					if (method) method.apply(this, arguments);\
+				}");
+		return callSelf;
+	}
+	
+})();
+
+
+/** END CLASS **/
+
+
+// hand-built mixin
+// TODO: build mixin automatically and hand-pick the "super" for each function
+//			at the time of application?
+
+(function(){
+	new Mixin({
+		name : "CheeseLover",
+		// get defaults based on the actual constructor (and possibly other arguments)
+		getDefaults : function(constructor) {
+			var asSuper = this.getSuperCaller(constructor);
+			return {
+				say : function say(msg) {
+					console.log("CheeseLover '"+this.name+"' sez: ",msg);
+					this[asSuper](msg);
+				}
+			}
+		}
+	});
+})();
+
+
+new Class(
+	{	name:"Animal", 
+		defaults : {
+			initialize : function initialize(props) {
+				this.extend(props);
+			},
+			say : function say(msg) {	
+				console.log("Animal '"+this.name+"' sez: ",msg) 
+			}
+		}
+	}
+);
+
+new Class(
+	{	name:"Mammal", 
+		"super":"Animal", 
+		defaults : {
+			initialize : function initialize(props) {
+				this.asAnimal(props);
+			},		
+			say : function say(msg) {	
+				console.log("Mammal '"+this.name+"' sez: ",msg);
+				this.asAnimal(msg);
+			}
+		}
+	}
+);
+new Class(
+	{	name:"Mouse", 
+		"super":"Mammal", 
+		mixin: "CheeseLover",
+		defaults : {
+			initialize : function initialize(props) {
+				this.asMammal(props);
+			},
+			say : function say(msg) {	
+				console.log("Mouse '"+this.name+"' sez: ",msg);
+				this.asCheeseLover(msg);
+			}
+		}
+	}
+);
+
+var animal = new Animal({name:"animal"});
+var mammal = new Mammal({name:"mammal"});
+var mouse = new Mouse(
+	{	name:"mouse", 
+		say : function say(msg) {
+			console.log(this.name + " (instance) sez: ", msg);
+			this.asMouse(msg);
+		}
+	}
+);
+
+animal.say("yo");
+console.log("----");
+mammal.say("yo yo");
+console.log("----");
+mouse.say("yo yo yo");
+
+</script>
+
+</body>
+</html>

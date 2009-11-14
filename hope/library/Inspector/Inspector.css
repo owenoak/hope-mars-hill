@@ -1,0 +1,177 @@
+/*
+	background: 		e4ccac
+	outerborder:		72624d
+	middleborder:		c8b294
+	innerborders:		ab977c
+	
+
+*/
+#Inspector {
+	position:absolute;
+	width:80%;
+	left:10%;
+	height:260px;
+	border:3px solid #72624d;
+	-moz-border-radius:10px;
+	-moz-box-shadow: 5px 5px 10px black;
+	background-color:#ab977c;
+}
+
+#Inspector, #Inspector * {
+	font-family:Verdana;
+	font-size:9px;
+	-moz-box-model:border-box;
+}
+
+#InspectorBody {
+	position:absolute;
+	display:inline;
+	top:30px;
+	bottom:0px;
+	left:0px;
+	right:0px;
+	-moz-border-radius:10px;
+	background:#e4ccac;
+	overflow-x:auto;
+	overflow-y:hidden;
+}
+
+#InspectorDisplay {
+	position:absolute;
+	top:8px;
+	bottom:8px;
+	left:8px;
+	-moz-border-radius:10px;
+	white-space:nowrap;
+	background:#ab977c;
+	/*-moz-box-shadow:2px 2px 4px black;*/
+}
+
+#InspectorClose {
+	position:absolute;
+	background:url(img/hope_round_close_light.png);
+	width:24px;
+	height:24px;
+	top:-12px;
+	left:-12px;
+	cursor:pointer;
+}
+
+#InspectorClose:hover {
+	background:url(img/hope_round_close.png);
+}
+
+#Inspector .Title {
+	font-weight:bold;
+	font-size:1.8em;
+	padding-left:1em;
+}
+
+#Inspector .show {
+	padding-left:4em;
+	width:100%;
+}
+
+#Inspector .show INPUT {
+	width:200px;
+}
+
+#Inspector LABEL,
+#Inspector input[type=checkbox] {
+	cursor:pointer;
+}
+
+#Inspector .showInherited,
+#Inspector .showMethods {
+	padding-right:1em;
+}
+
+
+#Inspector .Panel {
+	display:inline-block;
+	background:antiquewhite;
+	padding:3px;
+	height:198px;
+	width:150px;
+	border:3px solid #ab977c;
+	-moz-border-radius:10px;
+	padding:5px;
+	margin-right:-3px;
+	
+}
+
+#Inspector .Panel:last-child {
+	margin-right:0px;
+}
+
+#Inspector .PanelBody {
+	overflow-x:hidden;
+	overflow-y:auto;
+	height:100%;
+}
+
+#Inspector .StringPanel {
+	white-space:normal;
+	overflow-x:auto;
+}
+
+#Inspector .FunctionPanel {
+	white-space:pre;
+	overflow-x:auto;
+}
+
+#Inspector .topTable {
+	width:100%;
+}
+
+#Inspector .topTable TD {
+	white-space:nowrap;
+}
+
+#Inspector .Thing {
+	width:100%;
+	overflow:visible;
+	white-space:nowrap;
+	cursor:pointer;
+}
+
+#Inspector .Thing.selected {
+	background-color:#72624d;
+	color:#e4ccac;
+	-moz-border-radius:5px;
+}
+
+#Inspector .Thing.Inherited {
+	color:#666;
+}
+
+#Inspector .Thing .name {
+	font-weight:bold;
+}
+
+#Inspector .Thing .value {
+	opacity:.5;
+}
+
+
+/* add icons to some things */
+#Inspector .Thing {
+	background-repeat:no-repeat;
+	background-position:left;
+
+	padding:1px 1em 1px 17px;
+	border-left-width:0px;
+}
+
+#Inspector .Class 		{	background-image:url(img/class.png);		}
+#Inspector .Mixin 		{	background-image:url(img/mixin.png);		}
+#Inspector .Location 	{	background-image:url(img/location.png);	}
+#Inspector .Template 	{	background-image:url(img/template.png);	}
+#Inspector .Object 		{	background-image:url(img/object.png);		}
+#Inspector .Array 		{	background-image:url(img/array.png);		}
+#Inspector .Function 	{	background-image:url(img/function.png);	}
+#Inspector .String 		{	background-image:url(img/string.png);		}
+#Inspector .Number 		{	background-image:url(img/number.png);		}
+#Inspector .Boolean 	{	background-image:url(img/boolean.png);	}
+#Inspector .Element 	{	background-image:url(img/element.png);	}
+#Inspector .File	 	{	background-image:url(img/file.png);		}

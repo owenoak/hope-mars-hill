@@ -1,0 +1,71 @@
+What are we after right now?
+	* lots of functionality available as global methods (convenience)
+		and bound to Element, etc as necessary
+	* simple/quick script/css/etc loader
+	* simple/quick script <--> file system
+	* simple/quick class system w/ deferred dependencies
+		- load one or more packages
+		- reference object constructors to auto-load the objects
+		- also recognize unknown tags (expensive?)
+
+
+What often happens on these projects is that I get bogged down in the details.
+I *like* writing the details, but it does take a while and then I lose focus.
+
+Start from API/functionality first?
+Needs:
+	* Object/DOM utility functions
+		- global methods:
+			- extend(it, source1, source2, etc)
+			- serialize(it)
+			- deserialize(it)
+			- uniqueProperitesOf(it)			<- RENAME?
+
+			- setCookie(key, value, expires)
+			- clearCookie(key)
+			- remember(key [, value])
+			- forget(key)
+			
+			- setDebug(topic, level, save)		<-- RENAME?
+			- saveDebug()
+			- loadDebug()
+			- debug()
+			- warn()
+			- error()
+			
+		- singletons:
+			- cookie
+			- debug
+			- warn
+			- error
+
+		- String
+		- Object
+			- toArray(obj, separator, quotify)
+			- 
+		- Array
+		- Date
+		- Element
+		- Event
+	
+	* Pseudo-classes
+		- Location(url)
+			- .h
+		
+	* Package system with efficient loading
+		- each package has a manifest
+		- packages can be pre-compiled (results in 1 each: .js, .css, etc)
+		- later packages can add to previous ones via overlay
+			- eg: redefine the look of a button in a theme package
+		- eventually: analysis of app & packages for custom loading
+
+	* Class sytem with auto-dependency loading
+		- just Classes and Mixins
+		- don't use new() when creating so we can defer?  
+			- that was yucky in hope-gastonia
+		- make loading dependencies synchronous?
+
+	* Go to and from files (as xml) for loading/saving
+		- distinguish between saved and runtime-only properties
+		- quick way to get unique properties of object for saving
+			(have separate data object?)

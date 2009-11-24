@@ -1,6 +1,6 @@
 /*
 	Element (and Document) extensions
-	
+
 	TODO:
 		- cumulativeOffset  (containerX/Y?) etc
 		- absolutize/relativize
@@ -15,9 +15,9 @@ Debuggable.applyTo(Element.prototype, "element");
 document.head = document.querySelector("HEAD") || document.querySelector("HTML");
 
 
-// add extension methods to Element and Document
-Element.extend = Document.extend = extendPrototype;
-
+// add extension methods to Element
+Element.extend = extendPrototype;
+Element.extendClass = extendThis;
 
 
 // pattern:  set a JS object as our 'target' for event callbacks/manipulation
@@ -45,68 +45,71 @@ var elementMethods = {
 	get html() {
 		return this.innerHTML;
 	},
-	
+
 	set html(html) {
 		this.destroyChildren();
 		this.innerHTML = html;
-		this.initializeChildEvents();
+		this.hookupChildEvents();
 	},
-	
+
 
 	//
 	//	child/parent manipulation
 	//
 
-	// add one or more elements to end of my list of elements
-	add : function add() {
-		for (var i = 0, len = arguments.length; i < len; i++) {
-			if (!arguments[i]) continue;
-			this.appendChild(arguments[i]);
+	// add the element to a specific spot in my list of elements (before later children)
+	//	if index is undefined, appends to end
+	add : function add(element, index) {
+		if (typeof index != "number" || index >= this.children.length) {
+			index = this.children.length;
+		}
+		var nthChild = this.elements[index];
+		if (nthChild) {
+			this.insertBefore(element, nthChild);
+		} else {
+			this.appendChild(element);
 		}
 		return this;
 	},
 
-	// alias of add
-	append : function append() {
-		for (var i = 0, len = arguments.length; i < len; i++) {
-			if (!arguments[i]) continue;
-			this.appendChild(arguments[i]);
-		}
-		return this;
+	// add the element to the end of my list of elements
+	// goes through 'add' for consistency
+	append : function append(element) {
+		return this.add(element);
 	},
 
 	// add one or more elements to front of my list of elements
-	prepend : function prepend() {
-		for (var i = arguments.length; i >= 0; i--) {
-			if (!arguments[i]) continue;
-			if (!this.firstChild) 	this.appendChild(arguments[i]);
-			else					this.insertBefore(arguments[i], this.firstChild);
-		}
-		return this;
+	//	goes through 'add' for consistency
+	prepend : function prepend(element) {
+		return this.add(element, 0);
 	},
-	
+
 	// append this element to someone else
-	appendTo : function appendTo(newParent) {
-		newParent.appendChild(this);
+	appendTo : function appendTo(parent) {
+		parent.append(this);
 	},
-	
+
 	// prepend this element to someone else
-	prependTo : function prependTo(newParent) {
-		newParent.prepend(this);
+	prependTo : function prependTo(parent) {
+		parent.prepend(this);
 	},
 
 	// remove everything from this element
 	empty : function empty() {
-		this.innerHTML = "";
+		this.html = "";
 	},
 
-	// pass in empty to remove us from our parent node
-	// pass in an element to remove that element from us
+	// remove an element from us
 	remove : function remove(element) {
-		if (element == null) return this.parentNode.remove(this);
 		return this.removeChild(element);
 	},
-	
+
+	// remove us from our parent node
+	orphan : function remove() {
+		this.parentNode.remove(this);
+		return this;
+	},
+
 	// replace one element with another
 	//	NOTE: the syntax is opposite of replaceChild
 	replace : function replace(oldElement, newElement) {
@@ -122,19 +125,16 @@ var elementMethods = {
 	//
 	//	ancestry
 	//
-	
-	// are we a child of parent
-	childOf : function(parent) {},
 
-	// are we an ancestor of child
-	ancestorOf : function(child) {},
+	get parent() {
+		return this.parentNode;
+	},
 
-
-	//  Return our closest parent.
+	//  Return our closest parent where selector matches
 	//	If selector is not passed, returns our immediate parentNode.
 	//	If selector is passed, returns first parent where parent.matches(selector) is truthy.
 	//	Selector can be a string (css selector) or function [see element.matches()].
-	parent : function(selector) {
+	selectParent : function(selector) {
 		if (!selector) return this.parentNode;
 		var parent = this;
 		while (parent = parent.parentNode) {
@@ -143,25 +143,43 @@ var elementMethods = {
 	},
 
 	//  Return an array of our parent elements, with the closest parent as first in the list.
-	//	If selector is not passed, returns all parents.
+	//	If selector is not passed, returns all ancestors.
 	//	If selector is passed, only returns elements where parent.matches(selector) is truthy.
 	//	Selector can be a string (css selector) or function [see element.matches()].
 	//
 	// 	NOTE: the returned list DOES NOT INCLUDE the document object.
-	parents : function parents(selector) {
-		var parents = [], parent = this;
+	ancestors : function ancestors(selector) {
+		var ancestors = [], parent = this;
 		while (parent = parent.parentNode) {
 			if (selector) {
-				if (parent instanceof Element && parent.matches(selector)) parents.push(parent);
+				if (parent instanceof Element && parent.matches(selector)) ancestors.push(parent);
 			} else {
-				parents.push(parent);
+				ancestors.push(parent);
 			}
 		}
-		return parents;
+		return ancestors;
 	},
 
+	// are we an immediate child of parent?
+	isChildOf : function(parent) {
+		return (this.parentNode == parent);
+	},
 
-	//	
+	// are we a descendant of ancestor?
+	isDescendantOf : function(ancestor) {
+		var parent = this;
+		while (parent = parent.parentNode) {
+			if (parent == ancestor) return true;
+		}
+		return false;
+	},
+
+	// are we an ancestor of child?
+	isAncestorOf : function(child) {
+		return child.descendantOf(this);
+	},
+
+	//
 	//	selecting nodes via CSS selectorss
 	//
 
@@ -171,7 +189,7 @@ var elementMethods = {
 		if (selector instanceof Element) return selector;
 		return this.querySelector(selector);
 	},
-	
+
 	// returns all items that match selector
 	selectAll : function selectAll(selector) {
 		return this.querySelectorAll(selector);
@@ -188,11 +206,11 @@ var elementMethods = {
 	matches : function(selector) {
 		if (typeof selector == "string") {
 			// TODO: this is not very efficient...
-			var parent = this.parentNode, 
+			var parent = this.parentNode,
 				matching = parent.selectAll(selector)
 			;
 			return matching.contains(this);
-			
+
 		} else if (typeof selector == "function") {
 			return (selector.call(this, this) ? true : false);
 		}
@@ -204,7 +222,6 @@ var elementMethods = {
 	//	attribute methods
 	//
 
-	
 
 	// add the attributes of this element to object
 	//	if object is not passed in, makes an anonymous object
@@ -247,7 +264,7 @@ var elementMethods = {
 		this.setAttribute(name, newValue);
 		return this;
 	},
-	
+
 	// Remove valueToRemove from the list-like attribute <name>.
 	// Delimiter is used to split the attribute value up -- default is " ".
 	removeFromAttribute : function(name, valueToRemove, delimiter) {
@@ -266,7 +283,7 @@ var elementMethods = {
 		this.setAttribute(name, newValue);
 		return this;
 	},
-	
+
 	// Toggle the presence of <value> in list-like attribute <name>.
 	//	Condition can be:
 	//		- undefined : we'll remove <value> if it was present or add it if it was not.
@@ -279,34 +296,34 @@ var elementMethods = {
 		} else if (typeof condition == "function") {
 			condition = condition.call(this, name, value);
 		}
-		
+
 		if (condition) 	return this.addToAttribute(name, value, delimiter);
 		else			return this.removeFromAttribute(name, value, delimiter);
 	},
-	
+
 	//
 	// class name manipulation
 	//
 	hasClass : function(name) {
 		return this.attributeContains("class", name);
 	},
-	
+
 	addClass : function(name) {
 		return this.addToAttribute("class", name);
 	},
-	
+
 	removeClass : function(name) {
 		return this.removeFromAttribute("class", name);
 	},
-	
+
 	// if element had the name, removes it -- otherwise adds it
 	//	pass condition of function (called with 'this' as element)
 	//		boolean, etc to set explicitly  [ see element.toggleAttribute() ]
 	toggleClass : function(name, condition) {
 		return this.toggleAttribute("class", name, condition);
 	},
-	
-	
+
+
 	//
 	//	style manipulation
 	//
@@ -318,9 +335,10 @@ var elementMethods = {
 	},
 
 	// return the current style for prop (in camelCase form)
+	// todo: prop as an array?  props as a commaized string?
 	get : function(prop) {
 		var style = this.computedStyle;
-		if (arguments.length == 1) {
+		if (arguments.length == 1 && typeof prop == "string") {
 			return style[prop];
 		} else {
 			var props = {};
@@ -330,7 +348,7 @@ var elementMethods = {
 			return props;
 		}
 	},
-	
+
 	// set a bunch of styles either as:
 	//		string of  "camelCaseProp:blah;otherProp:blah;"
 	//  or  object of  {camelCaseProp:'blah', otherProp:'blah'}
@@ -349,28 +367,24 @@ var elementMethods = {
 		}
 		return this;
 	},
-	
-	
+
+
 	//
 	//	visibility		-- TODO: use css class to hide?
 	//
-	
-	get display() {
-		return this.get("display");
-	},
-	
-	set display(display) {
-		this.style.display = display;
-	},
 
-	// TODO: this needs to look at our parents
+	// return true if we are visible (eg: us and our ancestors are all not display:none)
 	isVisible : function() {
 		if (this.display == "none") return false;
-		return this.parents().every(function(parent) {
+		return this.ancestors().all(function(parent) {
 			return parent.display != "none";
 		});
 	},
 	
+	setVisible : function(visible) {
+		return (visible == false ? this.hide() : this.show());
+	},
+
 	show : function() {
 		// if style.display is actually set, clear it
 		if (this.style.display) {
@@ -383,75 +397,48 @@ var elementMethods = {
 		}
 		return this;
 	},
-	
+
 	hide : function() {
 		this.style.display = "none";
 		return this;
 	},
-	
+
 	toggle : function() {
 		if (this.isShown()) 	return this.hide();
 		else					return this.show();
 	},
 
+	//
+	//	enable/disable semantics
+	//
 	
-	// duration of an animation by default
-	animationDuration : 250,
-	
-	// number of steps for an animation by default
-	animationSteps : 10,
-	fade : function(duration, callback, direction) {
-		if (!duration) duration = parseInt(this.animationDuration);
-		var startOpacity = parseFloat(this._startOpacity 
-							|| (this._startOpacity = (this.get("opacity") || 1))
-						   );
-
-		var element = this,
-			delta = startOpacity / this.animationSteps,
-			index = 0
-		;
-		
-		if (direction == "out") {
-			var opacity = startOpacity;
-			delta = -1 * delta;
-			function end()	{	element.style.display = "none"; element.style.opacity = startOpacity;}
-		} else {
-			var opacity = this.style.opacity = 0
-			this.style.display = "";
-			function end()	{}
-		}
-
-		function step() {
-			if (++index > element.animationSteps) {
-				clearInterval(interval);
-				end();
-				if (callback) callback();
-			}
-			element.style.opacity = (opacity += delta);
-		}
-		var interval = setInterval(step, duration / this.animationSteps);
+	setEnabled : function(enable) {
+		if (enable == false) 	return this.disable();
+		return this.enable();
 	},
 	
-	fadeIn : function(duration, callback) {
-		this.fade(duration, callback, "in");
+	enable : function enable() {
+		this.removeAttribute("disabled");
+		return this;
 	},
 	
-	fadeOut : function(duration, callback) {
-		this.fade(duration, callback, "out");
+	disable : function disable() {
+		this.setAttribute("disabled", "true");
+		return this;
 	},
-
+	
 
 	//
 	//	size and position
-	//	
-	
+	//
+
 	// return true if this element is position is one of 'absolute', 'relative' or 'fixed'
 	isPositioned : function() {
 		var position = this.get('position');
 		return (position == 'absolute' || position == 'relative' || position == 'fixed');
 	},
-	
-	
+
+
 	//  Make the element absolutely positioned at its current place in the document.
 	//	If <toPage> is false, element stays within its container.
 	//	If <toPage> is true,  element is re-rooted to <body> element.
@@ -460,7 +447,7 @@ var elementMethods = {
 			if (this.get('position') == "absolute" && this.parentNode == document.body) return this;
 			var rect = this.rect;
 			document.body.add(this);
-			
+
 		} else {
 			if (this.get('position') == "absolute") return this;
 			var rect = this.offsetRect;
@@ -474,27 +461,28 @@ var elementMethods = {
 
 		return this;
 	},
-	
-		
+
+
 	// first parent with relative/absolute positioning
 	get offsetParent() {
-		return this.parent(this.isPositioned);
-	},
-	// all parents with relative/absolute positioning
-	get offsetParents() {
-		return this.parents(this.isPositioned);
+		return this.selectParent(this.isPositioned);
 	},
 	
+	// all ancestors with relative/absolute positioning
+	get offsetParents() {
+		return this.ancestors(this.isPositioned);
+	},
+
 	get offsetRect() {
 		return new Rect(this.offsetLeft, this.offsetTop, this.width, this.height);
 	},
-	
-	// return an object with {left, top, right, bottom, width, height} relative to the page 
+
+	// return an object with {left, top, right, bottom, width, height} relative to the page
 	get rect() {
 		return new Rect(this.left, this.top, this.width, this.height);
 	},
 
-	
+
 	// return the left of this element relative to the entire page
 	get left() {
 		var left = this.offsetLeft;
@@ -503,7 +491,7 @@ var elementMethods = {
 		});
 		return left;
 	},
-	
+
 	// return the top of this element relative to the entire page
 	get top() {
 		var top = this.offsetTop;
@@ -519,11 +507,11 @@ var elementMethods = {
 		this.style.left = left;
 	},
 	set top(top) {
-		if (typeof left == "number") left += "px";
+		if (typeof top == "number") top += "px";
 		this.style.top = top;
 	},
-	
-	
+
+
 	//
 	// get/set outside width/height of the element (including border+padding, not including margin)
 	//
@@ -542,7 +530,7 @@ var elementMethods = {
 		if (typeof height == "number") height += "px";
 		this.style.height = height;
 	},
-	
+
 	//
 	// get/set content width/height -- does NOT include border, padding or margins
 	//
@@ -578,9 +566,9 @@ var elementMethods = {
 		this.style.height = height + "px";
 		return height;
 	},
-	
-	
-	
+
+
+
 	// return the padding for this element as {left, top, right, bottom}
 	get padding() {
 		var style = this.computedStyle;
@@ -613,7 +601,7 @@ var elementMethods = {
 			bottom : parseFloat(style.marginBottom)
 		}
 	},
-	
+
 	// resize to a specific (outer) width and height
 	//	TODO: animation?
 	resize : function resize(width, height) {
@@ -621,8 +609,8 @@ var elementMethods = {
 		if (height != undefined) this.height = height;
 		return this;
 	},
-	
-	// TODO: animation	
+
+	// TODO: animation
 	moveTo : function(left, top) {
 		if (left != undefined) this.left = left;
 		if (top != undefined) this.top = top;
@@ -638,7 +626,7 @@ var elementMethods = {
 		this.height = rect.height;
 	},
 
-	
+
 	//
 	//	scroll
 	//
@@ -653,75 +641,77 @@ var elementMethods = {
 		this.scrollTop = top;
 	},
 
-	
+
 	//
 	//	element creation
 	//
-	
+
 	// Compact syntax to create an element with specified tag name and extras
 	// Attributes are attribute values to assign to the element
 	// Special attributes:
 	//		parent				- selector for parent to add new node to (eg: "#someId" or "HEAD")
 	//		where				- 'where' parameter for parent.add() routine (see 'element.add')
 	//		html or innerHTML	- html contents for the new element
-	//		
+	//
 	create : function create(tagName, attributes) {
 		// the following tags need to be created in an enclosing tag to work properly
 		var enclosedTags = {
 				"style":"div",
 				"td" : "table",
 				"tr" : "table"
-			}, 
+			},
 			enclosingTag = enclosedTags[tagName.toLowerCase()]
 		;
-	
-		var element, 
-			html = "", 
+
+		var element,
+			html = "",
 			text = "",
-			parent, 
+			parent,
 			where,
 			attrString = []
 		;
-		
+
 		// if we're not dealing with an enclosing tag, create the element directly
 		if (!enclosingTag) {
 			element = document.createElement(tagName);
 		}
-		
+
 		// process attributes
 		if (attributes) {
 			if (typeof attributes == "string") {
 				html = attributes;
-				
+
 			} else {
 				for (var name in attributes) {
 					var value = attributes[name];
-					
+
 					switch (name) {
 					  case "parent":
 						// get the parent as a CSS selector (we'll install it below)
 						if (value == "this" || value == "self") parent = this;
-						else									parent = this.select(value);
+						else if (value instanceof Element)		parent = value;
+						else if (typeof value == "string")		parent = this.select(value);
+						else console.warn(".create(",tagName,",",attributes,"): Couldn't understand parent ",value);
 						break;
-						
+
 					  case "class":
 					  case "className":	if (element) 	element.className = value;
 					  					else			attrString.push("class='"+value+"'");
 					  					break;
-					  
+
 					  case "style":
 					  					if (element)	element.setStyles(value);
 					  					else			attrString.push("style='"+value+"'");
-					  
+
 					  case "html":
 					  case "innerHTML":
 						html = value;
 						break;
-						
+
 					  case "text":
 					  	text = value;
 					  	break;
-						
+
 					  default:
 						// DEBUG: try...catch to make sure name/value are legal
 						if (element)	element.setAttribute(name, value);
@@ -731,46 +721,40 @@ var elementMethods = {
 				}
 			}
 		}
-		
+
 		// if we haven't created the element yet
 		//	construct HTML for the inner tag and recusively call create with the enclosing tag
 		//	then get the created element
 		if (!element) {
-			var enclosedHTML = "<"+tagName+" "+attrString.join(" ")+">" + 
+			var enclosedHTML = "<"+tagName+" "+attrString.join(" ")+">" +
 						html + text +		// note: not well defined if you pass both text and html
 					"</"+tagName+">"
 			;
 			element = this.create(enclosingTag, enclosedHTML).select(tagName);
 		} else {
-			if (html) element.innerHTML = html;
+			if (html) element.html = html;
 			if (text) element.add(document.createTextNode(text));
 		}
-		
+
 		// append to parent, if specified
 		if (parent) parent.appendChild(element);
-	
+
 		return element;
 	},
 
 	// clean up this and it's children by removing their data cache and clearing event handlers
 	// TODO: would be good to have a plugin architecture here?
 	destroy : function(destroyChildren) {
-		// TODO: clean up event handlers?
-		delete ElementDataCache[this.globalId];
-		this.stopObservingAll();
-		if (this.childNodes.length && destroyChildren) this.destroyChildren();
+		this.clearData();
+		if (this.childNodes.length && destroyChildren != false) this.destroyChildren();
 	},
-	
+
 	// clean up the children of this node by removing their data cahe
 	destroyChildren : function() {
-		this.selectAll("[globalId]").forEach(function(descendant) {
-			// NOTE: "false" below tell kids not to destroy *their* kids 
-			//			since we're getting all descendants with the select above
-			descendant.destroy(false);
-		});
+		this.elements.invoke("destroy");
 	},
-	
-	
+
+
 	//
 	//	element to JS object
 	//
@@ -784,7 +768,7 @@ var elementMethods = {
 	// get the constructor for the JS Class that corresponds to this element (if defined)
 	// TODO: rename this
 	get hopeClass() {
-		return hope.getClass(this.hopeType);
+		return Class.getClass(this.hopeType);
 	},
 
 	// convert this element into a JS object
@@ -821,7 +805,7 @@ var elementMethods = {
 				});
 			}
 		}
-*/		
+*/
 		return object;
 	}
 }
@@ -830,216 +814,4 @@ var elementMethods = {
 // add the elementMethods methods to Element.prototype and Document.prototype
 Element.extend(elementMethods);
 
-
-
-
-var documentMethods = {
-	create 		: Element.prototype.create,
-	select 		: function(selector) {	return document.querySelector(selector)	},
-	selectAll 	: function(selector) {	return document.querySelectorAll(selector)	}
-};
-
-extend(document, documentMethods);
-extend(window, documentMethods);
-
-
-
-
-
-//	::
-//	::	Data Cache
-//	::
-//		Safe way of attaching non-string data to any element (eg: functions, objects, etc).
-//		Note:  element.clearData() will clear the data cache for this element if it is called
-//
-(function() {
-	// NOTE: "this" is the element in question
-	function makeDataFor() {
-		// move the getter function aside
-		delete Element.prototype.data;
-		// assign a new data ListMap to this object
-		this.data = new ListMap();
-		// set an attribute on the element so we know to clear its data object later
-		this.setAttribute("hasData","true");
-		// restore the getter function
-		Element.prototype.__defineGetter__("data", makeDataFor);
-		return this.data;
-	}
-	// set up the getter function initially
-	Element.prototype.__defineGetter__("data", makeDataFor);
-	
-	Element.prototype.clearData = function clearData() {
-		delete this.data;
-		this.removeAttribute("hasData");
-	}
-
-	// clear element data for ALL elements in the document that have it set up
-	//	NOTE: will not clear elements which have been removed from the document...
-	document.clearElementData = function clearElementData() {
-		// clear the data property from all elements with 'hasData=true'
-		document.select("[hasData]").invoke("clearData");
-	}
-})();
-
-
-
-//	::
-//	::	Event methods
-//	::
-//
-//	TODO:  - call hookupEvents on:
-//				- create 
-//				- set html
-//				- 
-//			- special event stuff
-//			- call cleanupEvents() on... ?
-//			- figure out how a handler says 'don't continue' -- throw something?
-//			- figure out bubbling?
-//
-(function() {
-
-	// registry of standard handlers
-	var Handlers = {}
-	function getEventHandler(eventName){
-		return Handlers[eventName] || 
-			   (Handlers[eventName] = function(event){ this.fire(eventName, event) });
-	}
-
-	Element.extend({
-		// hookup events for this node and all of its descendants
-		hookupEvents : function hookupEvents(skipChildren) {
-			var eventNames = this.getAttribute("observes");
-			if (!eventNames) return;
-			// remove the 'observes' flag as an indicator that we're already set up
-			this.removeAttribute("observes");
-			this.data.observing = [];
-	
-			eventNames.split(" ").forEach(function(item) {
-				item = item.split(":");
-				var eventName = item[0],
-					methodName = item[1] || "on"+eventName
-				;
-				this.observe(eventName, methodName);
-			}, this);
-			if (skipChildren != true) this.hookupChildEvents();
-		},
-	
-		// hookup events for all of our descendants
-		hookupChildEvents : function hookupChildEvents() {
-			var kids = this.selectAll("[observes]");
-			if (!kids || kids.length == 0) return;
-			kids.forEach(function(kid) {
-				kid.hookupEvents(true);		// true == kids should not recurse
-			});
-		},
-	
-		// observe an event
-		observe : function observe(eventName, handler, target, args) {
-			var data = this.data;
-	
-			// set up the standard event handler if it hasn't been done already
-			if (!data.observing) data.observing = [];
-			if (!this.isObserving(eventName)) {
-				// hook up the actual event(s)
-				var specialHookup = Element.SpecialEvents.observe[eventName];
-				if (specialHookup) {
-					specialHookup.apply(this, [eventName]);
-				} else {
-					this.addEventListener(eventName, getEventHandler(eventName), false);
-				}
-
-				data.observing.push(eventName);
-				this.setAttribute("observing", data.observing.join(" "));
-			}
-
-			// store handler+target+args so we can call it later
-			data.addTo(eventName, [handler, target, args]);
-		},
-		
-		// observe an event exactly once and then remove it
-		observeOnce : function observeOnce(eventName, handler, target, args) {
-			function removeHandler() {
-				this.stopObserving(eventName, handler, target);
-			}
-			this.observe(eventName, handler, target, args);
-			this.observe(eventName, removeHandler, this);
-		},
-	
-		// stop observing an event
-		stopObserving : function stopObserving(eventName, handler) {
-			this.data.removeFrom(eventName, function(item) {
-				if (item[0] == handler) return true;
-			});
-		},
-		
-		// are we observing a particular event?
-		isObserving : function(eventName) {
-			if (typeof eventName == "string") {
-				return this.data.observing.contains(eventName);
-			} else if (eventName.some) {
-				// otherwise assume it is an array
-				//	and return true if we're observing at least one of the events
-				return eventName.some(function(eventName) {
-					return this.isObserving(eventName);
-				}, this);
-			}
-			return false;
-		},
-	
-		// Return the default target of our events as set in our "eventTarget" attribute.
-		//	(This will generally be a Control of some sort.)
-		// If no "eventTarget" was specified, defaults to this element itself.
-		get eventTarget() {
-			if (this.data.eventTarget === undefined) {
-				var target = this.getAttribute("eventTarget");
-				this.data.eventTarget = (target ? hope.get(target) : null);
-			}
-			return this.data.eventTarget || this;
-		},
-		
-		// Fire an event.
-		// TODO: how to signal stop processing or continue?
-		fire : function(eventName, event, fireArgs) {
-console.info("firing ",eventName," on ",this);
-			var handlerList = this.data[eventName];
-			if (!handlerList || handlerList.length == 0) return;	// TODO: how to signal stop processing or continue?
-			
-			var defaultTarget = this.eventTarget;
-			handlerList.forEach(function(item) {
-				var handler = item[0],
-					target = item[1] || defaultTarget,
-					args = Array.combine([event, this], item[2], fireArgs)
-				;
-				if (typeof handler == "string") {
-					if (! (handler = target[handler]) ) return;
-				}
-				// TODO: how to signal stop processing or continue?
-				handler.apply(target, args);
-				
-			});
-		}
-	});
-	
-	
-	// Hnadling special, non-standard browser events
-	// 	"observer" = function to use to set up event observation
-	//	"ignorer"  = function to use to stop observing event
-	Element.SpecialEvents = {
-		observe : {},
-		ignore : {}
-	}
-	Element.registerEvent = function(eventNames, observer, ignorer) {
-		if (typeof eventNames == "string") eventNames = eventNames.split(" ");
-		eventNames.forEach(function(eventName) {
-			Element.SpecialEvents.observe[eventName] = observer;
-			Element.SpecialEvents.ignore[eventName] = ignorer;
-		});
-	}
-	
-	
-	// TODO: 	- add data stuff to document
-	//			- add observe/etc to document
-	//		 	- add document.hookupEvents() to document.onload
-	document.hookupEvents = Element.prototype.hookupChildEvents;
-})();
 

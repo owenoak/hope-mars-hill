@@ -3,7 +3,7 @@
 	outerborder:		72624d
 	middleborder:		c8b294
 	innerborders:		ab977c
-	
+
 
 */
 #Inspector {
@@ -97,7 +97,7 @@
 	-moz-border-radius:10px;
 	padding:5px;
 	margin-right:-3px;
-	
+
 }
 
 #Inspector .Panel:last-child {
@@ -135,7 +135,7 @@
 	cursor:pointer;
 }
 
-#Inspector .Thing.selected {
+#Inspector .Thing.Selected {
 	background-color:#72624d;
 	color:#e4ccac;
 	-moz-border-radius:5px;

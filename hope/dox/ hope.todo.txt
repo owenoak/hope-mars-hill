@@ -1,0 +1,566 @@
+:::::::::::::::::::
+::: Global Todo :::
+:::::::::::::::::::
+
+- go through complete API
+	- everything that is global MUST be completely generically useful
+	- make things 100% consistent:
+		- element and ElementList
+		- array and Array and Iteratable
+
+::::::::::::::
+::: Borken :::
+::::::::::::::
+
+
+
+::::::::::::::::::::::::
+::: General/Patterns :::
+::::::::::::::::::::::::
+
+- come up with strict naming conventions:
+	- Class names		(ToolBar)
+	- file names		(ToolBar.js, Inspector.package.xml)
+	- instances			(toolBar)
+	- CSS class names	(all classes initial caps, all user things camelCase)
+	- app/page names
+	- constants?
+	- collections?		(ToolBars)
+
+- things like makeLoadable() functions are not very debuggable anyway
+	- would it be better to make them non-anonymous functions, created with evalScript()
+		that have function names and good comments?
+	- create the functions with templates?
+	- how do we get scope (eg: calling functions, etc) in there?
+
+- add a property to [Array, NodeList, etc].prototype so we can tell if they are actually arrays
+	- to handle case with absoluteUrl() etc where we want to multiplex for array but not nec. to element.children
+
+- have 'things' space segmented into types,
+	eg:  'package:hope' and 'page:foo'
+	? 'things' should have a name and a path?
+		- eg: 'page:reader',  'page:site/app/reader' ?
+
+- test speed of forEach() vs. inlined for(;;) calls for library stuff
+
+? how can I leverage workers?
+
+
+::::::::::::
+::: hope :::
+::::::::::::
+
+- have generic functions like extendPrototype() and extendThis() on hope rather than loose?
+
+
+
+::::::::::::::::::::::::::
+::: Array / Iteratable :::
+::::::::::::::::::::::::::
+
+- verify that Array & ElementList have all methods
+- array methods which return a new array (splice, etc) should return a new item of the same type?
+- 'all' and 'some' as boolean aggregators for Array
+- put all array.prototype methods on Array
+- iteratble methods could work on anything if:
+	- when adding/removing/etc, make sure .length is also updated
+
+- have 'Children' mixin which takes name of children and creates add/remove/etc routines
+	- just for basic add/remove, for most iteratable routines operate on children directly
+	- have 'children' be a getter, so it's empty until you look at it?
+	- the DataWidget stuff is really hard to debug
+		? what is our minimal set of functions to call on 'master' thinger?
+			- getChild
+			- setChild
+			- addChild
+			- removeChild
+			- ?
+		? subclass array (for each type?)
+		? 'Set' concept?
+
+
+::::::::::::::::::
+::: Collection :::
+::::::::::::::::::
+- the whole collection.get thing is annoying
+- make the collection a function, so you can say:
+			Templates(foo).blah.blah  ?
+	- the iteration is wierd with this pattern...
+
+
+:::::::::::::::
+::: Classes :::
+:::::::::::::::
+
+- we don't remember mixins, so we can't tell where some functions come from...
+- global id:
+	- when an instance of a 'collected' class is instantiated,
+		give it a global id and register it in a registry somewhere
+			(watch for not being able to reclaim anything cause always pointed to!)
+		- hope.instance(globalId) returns pointer to the instance for event handlers, hookups, etc
+		- instance.destroy removes instance from registry
+		- derive id from class?  error if id already exists?
+		- can you provide a globalId manually?
+	- you can have an instance cache just like element.data for getters/setters
+
+- test class creation time
+- test instance instantiation time vs. simple class
+
+
+:::::::::::::::::
+::: Debugging :::
+:::::::::::::::::
+
+
+- permissive debugging pattern
+	- put assertion checks in code (duck typing checks, not null, etc)
+		- if debugging that class, throw execptions
+		- otherwise silently fail
+
+- Class.startDebugging and Class.stopDebugging	('Debuggable' Interface)
+	- installed in all classes
+	- turns on debug assertions for the class for now forward on this run
+	- sets debug cookie for next run
+	- DebugTron - turn on debugging for all debuggable things
+
+- need some sort of unit test thing ASAP
+	consider:  http://rdoc.info/projects/thumblemonks/riot
+
+
+:::::::::::::::::
+::: Functions :::
+:::::::::::::::::
+
+- check speed of new Function() vs eval() vs jQuery globalEval
+- check debuggability of new Function() vs eval() vs jQuery globalEval
+
+
+::::::::::::::
+::: Loader :::
+::::::::::::::
+
+
+- test:
+	- loadX():
+		- when a file can't be loaded, make sure errback pattern is working
+
+	- loadFiles():
+		- when a file can't be loaded, make sure errback pattern is working
+
+	- package:
+		- don't auto-load things without [preload] extension  (also check loadHopePackage)
+
+	- caching scheme
+		- how to avoid loading hope on initial cache?
+
+	- check that loading 'things' is working
+
+
+- try...catch in loader callbacks
+- check all loader routines to warn/error if there's a problem
+
+- change loading pattern so all loaders take a 'defer' parameter
+	- rename "loadText()" to "get()"?  also   "getXML()"?
+	- note in documentation that e.g, 'defer' of scripts has a debugging penalty
+	- update 'load' and 'loadFiles' to take this into account
+	- have generic '.xml' loader which fires if no '.foo.xml' in place?
+	- change loadText() and loadXML() to work with errback (swallow=continue) pattern?
+	- loaders return the created thing, eg: the <script> element or the Package instance
+	- make sure loaders throw errors if couldn't be loaded or constructed
+	- make sure 'results' of loadMany()/loadFiles() gets updated correctly
+	? as Class pattern, have  'load()' and 'deferLoad()' methods for cleanliness?
+	? install 'load' and 'deferLoad()' on HTMLScriptElement prototype?
+		- on HTMLLinkElement()/HTMLStyleElement()
+	- eg:
+		Loader.makeLoadable({
+			type:"Script",
+			extensions: ".js",
+			load : function loadScript(url, defer, callback, errback) {
+				if (defer === undefined) defer = true;
+
+				var result,
+					script = document.createElement("script")
+				;
+
+				if (defer) {
+					script.onload = function() {
+						console.info("done loading script: ",url);
+						Loader.Loaded[url] = script;
+						if (callback) callback();
+					};
+					script.setAttribute("src", url);
+					if (errback) script.onerror = errback;
+					result = Loader.LOADING;
+				} else {
+					// TODO: how to handle error pattern here?
+					var text = Loader.loadText(url, defer);
+
+				}
+				(document.querySelector("head")||document.querySelector("html")).appendChild(script);
+
+				return Loader.LOADING;	// indicate that we're current loading
+			}
+		});
+
+
+- jresig sez that scripts must execute in document order
+	- if we append a new script AFTER the one currently being executed
+		maybe it will execute in the correct order?
+	- supposedly we can get a handle to the running script as the last one in the page
+	- use this to load hope files right after loader?
+
+- use this pattern:
+		http://ejohn.org/blog/degrading-script-tags/
+	to put code to execute in the loader, eg: to load the application, etc
+
+- evalScript:
+		- fix create so "text" creates and appends a text node (how debuggable is this?)
+		- name 'execute' ?
+		function evalScript(script) {
+			var element = create("script",{type:"text/javascript",text:script, parent:"head"});
+			element.remove();
+		}
+
+- onload of page, pick up all embedded scripts as loaded
+	- have to do after load so we pick up everything
+	- have a generic onload handler?
+
+
+
+
+
+
+::::::::::::::::::::::::
+::: Element/NodeList :::
+::::::::::::::::::::::::
+
+- select() and selectAll() could take a function...
+- sizers
+	- check all sizing things in Safari
+	- way to know when something is hidden?
+	- way to know when something hasn't finished drawing yet?
+	- check all sizing things when hidden
+		- how does prototype do it?
+	- some way of deferring until visible automatically?
+
+	- element.setRect()
+	- element.absolutize()
+
+- animation
+	- implement CSS animations ala Emile
+
+	- have animation property attributes on elements (with defaults on element.prototype)
+		- showAnimation
+		- resizeAnimation
+		- scrollSpeed
+	  ? how to get from control?
+	  
+	- some methods should take an animation property (or get from element?)
+		- show/hide/toggle
+		- resize / set width / set height
+		- scrollTo  (or just always animate?)
+		- fade (eg:  fade(60) animates from current to 60% )
+
+- ElementList
+	- make sure splice/etc return a new ElementList (I think they will)
+	- add same API to ElementList and NodeList that we have for elements
+
+
+
+:::::::::::::::
+::: Control :::
+:::::::::::::::
+
+- offset/left/etc routines -- just call on main?  make functions so we can do the selector thing?
+- check return values for all invoke() thingers
+- value semantics?
+
+- enumerateAncestors(method) & enumerateDescendants(method)
+	- call method for each ancestor/descendant
+	- throw to stop iterating
+	- how to do return value?
+
+
+
+::::::::::::::
+::: Events :::
+::::::::::::::
+
+	- should eventTarget bubble up?  maybe if element doesn't have that event?
+	- observes can pass target explicitly,
+		eg:
+			observes='click:hide' eventTarget='Inspector'
+		becomes
+			observes='click:Inspector.hide()'
+	- check other event stuff in Prototype
+		- Event.findElement(event, tagName) -> Element
+		  Returns the first DOM element with a given tag name,
+		  upwards from the one on which the event occurred.
+		  If no matching element is found, the document itself (HTMLDocument node) is returned.
+		  - do: element.selectParent(selector)
+
+		- check to make sure eventTarget stuff works
+		- fire event on eventTarget, even if element doesn't have that handler?
+			- or do we get that for free if the target sets 'observes' on the element?
+		- check that changing name of event (eg  "mousedown:thumbdown") works
+
+	- selectstart event?
+
+	- global mouse/key capture
+		- capture key / char ?
+		- check safari
+		- check windows
+
+	- hover support
+		- not working with nested elements -- enteringOrLeavingTarget ?
+		- don't like the name "element.stillActiveDelay"
+
+	- drag support
+		- dragOffset
+		- some sort of constraints system
+		- how to facilitate a dragProxy?
+
+	- drop support
+		- impelemnt basic support
+		- dragType/dropType processing
+
+	- "move" support
+		- implement basic support
+		- some sort of constraints system
+
+	- resize support
+		- implement
+		- integrate with dragStart, since we might want both on the same element?
+		- some sort of constraints system
+
+	- 'rightclick' support?
+		- 'rightdoubleclick' ?
+
+	- 'tripleclick' support?
+
+	- scroll wheel support
+
+	- event pattern:
+		- TODO: check to make sure eventTarget stuff is working properly
+		- element has attributes:
+			- "observes" = list of events that we want to observe
+							as "mouseover mouseout click:onblah"
+			- "eventTarget"   = global id of default target object events should be sent to
+
+		- when creating a node:
+			- call setUpEvents() which:
+				- calls observe for each event name in "observes"
+				- has flag to note that we're already observing
+
+		- on observe(event, handler, target, args)
+			- if not already observing that event type
+				- add [handler + target + args] to list
+				- add standard event handler
+				- add event type to "observes" attribute
+
+		- on ignore(event, handler, target)
+			- remove [handler + target + args] from list
+			- NOTE: we don't remove standard event handler since we may have default observer
+
+		- when destroying a node:
+			- call 'clearEvents()' which:
+				- ignores all 'observes'
+
+		- when event fires
+			- call for each handler+target+args in list
+				- if no target specified, use element.target
+			- if element.target && element.target["on"+eventName], call that
+			- how to signal stop firing?  throw CancelEvent ?
+			- do we need these to bubble?  probably not...
+
+		- TODO: set up this pattern in
+					- create()
+					- string.toElement()
+					- string.toElements()
+					- html()
+					- page load
+			? where else?
+			? can we enforce (in our code anyway) that these are the only
+				way to create elements?
+
+
+	- special mouse events:
+			mouseenter, mouseleave, hover, hoverout,
+			mousestilldown
+			dragstart, drag, dragend, dragenter, dragleave, drop
+			resizestart, resize, resizeend
+
+	- for each element, remember the event types we've registered
+		so we can clear them on destroy?
+
+
+	- way to set a different target  (eg: dragTarget, hoverTarget )
+
+	- might be nice if element
+			- has data.target and attribute[event]
+			- but no listeners for [event]
+		to just invoke event on target?  That way we don't have to bind?
+
+	- if handles an event, add css class when going into and out of event state?
+		- that might hadle a lot of interactions automatically
+		- eg:  on dragenter, add 'Dropping' class to element, remove on dragleave
+
+	- focus/blur at higher level?
+
+
+
+:::::::::::::::
+::: Layouts :::
+:::::::::::::::
+- Layouts are (named) singleton algorithms for determining layout of child controls,
+	partitioning the children into a set of 'cells'
+- Layouts work directly on controls, indirectly on controls' elements
+- Layouts are static, so the same layout can be used in many contexts
+- Layouts usually add a containing element around their content (always ?)
+- Layouts deal with items as border-box elements setting size of element irrespective of contents.
+
+? How to bridge divide between CSS (margin, width, etc) and specifying on object?
+
+- reference:  http://www.extjs.com/deploy/dev/examples/layout-browser/layout-browser.html
+
+- Styles
+	- flow			= no explicit-layout -- let the browser do the work
+	- center		= center children horizontally and stack them vertically
+	- horizontal	= lay out in horizontal blocks of same height
+	- hscroll		= horizontal blocks w/ scroll arrows when needed (eg: toolbar)
+	- hsplit		= split horizontally into panes with moveable split bars
+	- vertical		= lay out in vertical blocks of same width
+	- vscroll		= vertical blocks w/scroll arrows when needed (eg: menu)
+	- vsplit		= split vertically into panes with moveable split bars
+	- grid			= define rows/columns, place elements in particular row(s)+column(s)
+	- columns		= split into a number of columns (subset of grid)
+	- full			= child(ren) take full width+height of containing element (Ext: 'fit')
+	- fullwidth		= child(ren) take full width of container, height is auto
+	- fullheight	= child(ren) take full height of contianer, width is auto
+	- stack			= children are full width+height and overlap, so only one is visible
+
+	? compass		= NSEW layout (Ext calls this 'border' -- notice how panels can collapse)
+	? form			= labels + fields setup (possibly w/multiple columns?)
+	? table			= use standard HTML table for layout?
+	? accordion		= show headers of all children, but body of only one child at a time
+	?
+
+- Grid layouts:
+	- generally we will pre-define grid layouts by name and just reference them
+	- rows/columns can be named or can be referenced by number
+	- items can span multiple rows/columns
+
+- On layout.resize(), we will check to see if content is ready to be positioned
+	and will defer resize until position data is available if necessary
+
+- Layouts can have some or all of the following properties
+	- margin		= margins for each cell in the layout
+	- rows			=
+	- cols			=
+
+- Controls within a layout can have some or all of the following layout properties
+	- align			= [left center top] and/or [right middle bottom]
+	- row			= [grid layout]  name(s)/number(s) of the row(s) this control appears in
+	- col			= [grid layout]  name(s)/number(s) of the column(s) this control appears in
+	- margin		= Margins for this element.  Override's cell margins.
+	- width			= (explicit or from css???) -- percentage string == flexible amount
+	- height		= (explicit or from css???) -- percentage string == flexible amount
+	- min-width		= (explicit or from css???) -- percentage string == flexible amount
+	- min-height	= (explicit or from css???) -- percentage string == flexible amount
+	- max-width 	= (explicit or from css???) -- percentage string == flexible amount
+	- max-height	= (explicit or from css???) -- percentage string == flexible amount
+
+
+:::::::::::::::::
+::: Inspector :::
+:::::::::::::::::
+- make inspector widgets do event hookup!
+- make inspector moveable
+
+
+:::::::::::::::::
+::: Templates :::
+:::::::::::::::::
+
+- do 	with (firstArg) {...} 	to make simple dereferencing of first arg work?
+- Make it easy to do for...in and forEachs in templates
+- Have a way to look at a template and generate an 'updater' function automatically
+	? look at attributes and add 'updateThis' attribute, etc
+	? run the expander again and do a 'merge' on the elements?
+
+
+::::::::::::::
+::: Number :::
+::::::::::::::
+
+- add 'abs', etc methods to Number.prototype
+- limitDigits, pad, etc from prototype.extensions
+
+
+::::::::::::
+::: Date :::
+::::::::::::
+
+- date formatting stuff
+	- write parsers
+	- write some pretty printers
+	- reduce code size?
+- date math stuff
+
+:::::::::::::::::::::
+::: Compatibility :::
+:::::::::::::::::::::
+
+- There's really not that much we're doing right now that couldn't be done in IE
+	(or at least degrade pretty well)
+- The bitches of supporting IE are:
+	- browser peccadillos in language
+	- browser quirks in rendering
+	- no attaching to Element/Event prototype in IE6/7
+	- no getters/setters in IE6/7 (they are a nice to have)
+	- no canvas
+- What if we have a 'virtual browser' layer that we somehow attach to everything
+  and load the proper 'virtual browser' initially when loading hope?
+- I don't want to slow down my coding process to test IE
+- Fixing a complex system in IE will be a real bitch
+- Wait until we have an automated test suite?
+
+
+
+:::::::::::::::::
+::: Inspector :::
+:::::::::::::::::
+
+- make draggable
+- make resizable
+- Inspector is skipping Classes 'cause they are functions
+- 'show' field doesn't work
+- put current target thing into show field
+
+
+::::::::::::::::
+::: Docutron :::
+::::::::::::::::
+
+- have an xml-based documentation format
+	- split into files by thing:
+		- Element.doc
+		- Class.doc
+	- can also have an entry per function/object/etc, for more details, eg: for
+		- Element.prototype.foo.doc
+
+- docutron has a class/singleton browser and viewer
+	- browser has:
+		- all classes
+		- selected window objects
+	- viewer shows xml doc for that object
+
+- options:
+	- show inherited
+	- show private (?)
+	- show constants (?)
+	- show built-ins stuff
+	- sort by [type|name]
+	- 
+	
+	

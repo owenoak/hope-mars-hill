@@ -9,18 +9,26 @@ extend(Array.prototype, {
 	// give Arrays an "item" function (for conistency in Iteratables)
 	item : function item(index) {
 		return this[index];
-	},
-	
+		},
+
 	setItem : function(index, it) {
 		this[index] = it;
 	},
-	
+
 	// give Arrays a "clone" function (for consistency in iteratables)
-	clone : function clone() { 
+	clone : function clone() {
 		for (var array = [], index = 0, len = this.length; index < len; index++) {
 			array[index] = this.item(index);
 		}
 		return array;
+	},
+	
+	remove : function(it) {
+		var index;
+		while ( (index == this.indexOf(it)) != -1 ) {
+			this.splice(index, 1);
+		}
+		return this;
 	}
 });
 
@@ -47,6 +55,33 @@ extend(Array, {
 			if (arguments[i]) Array.toArray(arguments[i], output);
 		}
 		return output;
+	},
+
+	// splice list RETURNING REMAINING LIST (unlike Array.splice which returns stuff that was removed)
+	// use this to convert an Arguments array
+	splice : function(list, index, howMany, element1, element2, etc) {
+		list = Array.toArray(list);
+
+		// short cut for common case
+		if (arguments.length == 3) {
+			list.splice(index, howMany);
+		
+		} else if (arguments.length > 1) {
+			var args = Array.toArray(arguments);
+			args.splice(0, 1);
+			list.splice.apply(list, args);
+		}
+		return list;
+	},
+	
+	// given an array of function arguments, return a proper Array
+	//	if startAt is a number, we will skip elements before startAt
+	args : function(functionArguments, startAt) {
+		var array = [];
+		for (var i = startAt || 0, len = functionArguments.length; i < len; i++) {
+			array[array.length] = arguments[i];
+		}
+		return array;
 	}
 
 });

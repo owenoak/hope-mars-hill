@@ -1,18 +1,47 @@
-<div id='Inspector' style='display:none'>
-	<div id='InspectorClose' onclick='Inspector.hide()'></div>
-	<table class='topTable'><tr>
-		<td class='Title'>Inspector</td>
-		<td class='show'>Show: <input class='subject' value='window' onchange='Inspector.inspect(this.value)'></td>
-		<td class='showInherited'>
-			<input type='checkbox' id='showInherited' #{? it.showInherited ? "CHECKED" : ""} onchange='Inspector.showInherited = this.checked;Inspector.refresh();'>
-			<label for='showInherited'>Show Inherited</label>
-		</td>
-		<td class='showMethods'>
-			<input type='checkbox' id='showMethods' #{? it.showInherited ? "CHECKED" : ""} onchange='Inspector.showMethods = this.checked;Inspector.refresh();'>
-			<label for='showMethods'>Show Methods</label>
-		</td>
-	</tr></table>
-	<div id='InspectorBody'>
-		<div id='InspectorDisplay'></div>
+<template id='Inspector'>
+	<div id='Inspector' style='display:none'>
+		<div id='InspectorClose' observes='click:hide' eventTarget='Inspector'></div>
+		<table class='topTable'><tr>
+			<td class='Title'>Inspector</td>
+			<td class='show'>Show: <input class='subject' value='window' onchange='Inspector.inspect(this.value)'></td>
+			<td class='showInherited'>
+				<input type='checkbox' id='showInherited' << Inspector.showInherited ? "CHECKED" : "">> onchange='Inspector.showInherited = this.checked;Inspector.refresh();'>
+				<label for='showInherited'>Show Inherited</label>
+			</td>
+			<td class='showMethods'>
+				<input type='checkbox' id='showMethods' << Inspector.showMethods ? "CHECKED" : "">> onchange='Inspector.showMethods = this.checked;Inspector.refresh();'>
+				<label for='showMethods'>Show Methods</label>
+			</td>
+		</tr></table>
+		<div id='InspectorBody'>
+			<div id='InspectorDisplay'></div>
+		</div>
 	</div>
-</div>
+</template>
+
+<template id='Inspector.panel' args='className, items'>
+	<div class='Panel <<className>>' panelNum='<<Inspector.targets.length - 1>>' observes='click:panelClick' eventTarget='Inspector'>
+		<div class='PanelBody'>
+		<#>
+			items.forEach(function(item) {
+				output += Template.expand("Inspector.item", item[0], item[1], item[2], item[3]);
+			});
+		</#>
+		</div>
+	</div>
+</template>
+
+<template id='Inspector.item' args='prop, value, type, inherited'>
+	<div prop="<<''+prop>>"
+		 class="Thing <<type>> <<inherited ? 'Inherited' : ''>>"
+		 Xobserves="click:itemClick" eventTarget="Inspector"
+	><#>
+		var value;
+		if (type == "Array") value = "(length "+value.length+")";
+		else if (type == "String") value = value.makeHTMLSafe();
+		else value = ""+value;
+	</#>
+		<span class='name'><<prop>></span>
+		<span class='value'><<value>></span>
+	</div>
+</template>

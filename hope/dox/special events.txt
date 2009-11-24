@@ -1,0 +1,61 @@
+Special Events:
+
+		mouseenter, mouseleave
+		hover, hoverout, 
+		mousestilldown
+		dragstart, drag, dragend
+		dragenter, dragleave, drop
+		resizestart, resize, resizeend
+		focus, blur
+	
+Desires
+	- have an 'element.observes' attribute on element which turns on normal + special events
+		- how to hook up automatically?
+
+	- have 'element.control' attribute (global id) and property (pointer)
+		which points back to a control which manages this element
+
+	- auto-hookup to controls, eg, :
+			- element.observes "mouseenter"
+			- element.control is set, and
+			- element.control.onmousenter is defined, call that automatically
+			
+			- also call any events manually registered on the element
+	
+	- if element observes an event, we automatically add a CSS class for that event, 
+		- eg
+			- element observes "mouseenter"
+			- when mouse enters the element, we add the class "mouseenter"
+			- when mouse leaves the element, we remove the class "mouseenter"
+			
+		- classes:		.Inside			mouseenter/leave
+						.Hovering		hover/out
+						.Dragging		dragstart/dragend
+						.Dropping		dragenter, dragleave
+						.Dropped		drop
+						.Resizing		resizestart/resizeend
+						.Focused		focus/blur
+
+
+Strategy
+	- have efficient element.data
+	- have single set of page-level event handlers which do dispatching for specials
+		(for all events so we can do auto-hookup of normal events as well?)
+
+	- setting elements up:
+		- on dom manipulated:		(?)
+			- if element has an unprocessed 'observes' attribute:
+				- set element.observes to observes.split
+			- if element has an unprocessed 'control' attribute:
+				- set element.control to the control (by global id?)
+
+		- on element.observe(event, handler, target, args)
+			- add event to element.observes property (but not attribute)
+			- remember bound method in   element.data[event][...]
+		
+		- on element.ignore(event, handler, target)
+			- remove bound method from   element.data[event][...]
+			- if element.data[event] is empty, 
+				and element.attribute.observes 
+		
+		

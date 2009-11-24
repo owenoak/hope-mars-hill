@@ -1,5 +1,5 @@
-/* Array iterators:  
-	- add array iterator methods to list-like things, eg: NodeList, NamedNodeMap, etc 
+/* Array iterators:
+	- add array iterator methods to list-like things, eg: NodeList, NamedNodeMap, etc
 
 	TODO:		- makeIteratable() could (?) take a suffix to add to the methods
 					so we can do  "addChild" instead of "add" ???
@@ -10,7 +10,7 @@
 
 	TODO:		- require a "new":  concat, slice
 						- do with .constuctor ?
-						
+
 				- require being able to change the length:  shift, unshift, pop, splice
 						- do with "setLength" ?
 */
@@ -29,13 +29,13 @@ extend(Array, {
 			for (var name in Array.IteratorMethods) {
 				if (!Class.prototype[name]) Class.prototype[name] = Array.IteratorMethods[name];
 			}
-			
+
 			// set the Class.prototype.constructor to the Class (?)
 			//	so we can create new instances in concat() etc
 			Class.prototype.constructor = Class;
 		});
 	},
-	
+
 	// Add a method to the list of iterator methods
 	//	(and assign it to all Iteratables)
 	addIterator : function addIterator(name, method) {
@@ -44,24 +44,24 @@ extend(Array, {
 			if (!Class.prototype[name]) Class.prototype[name] = method;
 		});
 	},
-	
+
 	addIterators : function addIterators(map) {
 		for (var key in map) {
 			Array.addIterator(key, map[key]);
 		}
 	},
-	
+
 	// List of Array.prototype iteration/etc methods to add to other array-like things
 	IteratorMethods : {
-		
+
 		iteratable : true,			// flag that shows we can be iterated over
-		
+
 		extend : extendPrototype,
 		extendClass : extendThis,
-		
+
 		// convert to a vanilla Array
 		toArray : Array.prototype.clone,
-	
+
 		// return the index of what in this list
 		indexOf : function indexOf(it, index) {
 			if (!index) index = 0;
@@ -71,7 +71,7 @@ extend(Array, {
 			}
 			return -1;
 		},
-		
+
 		// return index of last occurance of it in the list
 		lastIndexOf : function lastIndexOf(it, index) {
 			if (!index) index = this.length;
@@ -81,7 +81,7 @@ extend(Array, {
 			}
 			return -1;
 		},
-	
+
 		// call a method for each item()  (no return value)
 		forEach : function forEach(method, context) {
 			for (var index = 0, len = this.length; index < len; index++) {
@@ -89,7 +89,7 @@ extend(Array, {
 				method.call(context, it, index, this);
 			}
 		},
-	
+
 		// return the results of method call for each item()
 		map : function map(method, context) {
 			var results = [];
@@ -99,7 +99,7 @@ extend(Array, {
 			}
 			return results;
 		},
-		
+
 		// return only item()s for which method call returns a true-ish value
 		filter : function filter(method, context) {
 			var results = [];
@@ -109,37 +109,64 @@ extend(Array, {
 			}
 			return results;
 		},
-		
+
 		// return true if method call for ALL item()s returns true-ish value
-		every : function every(method, context) {
-			for (var index = 0, len = this.length; index < len; index++) {
-				var it = this[index];
-				if (!method.call(context, it, index, this)) return false;
+		//  if you don't pass any arguments, returns true iff all list items are truthy
+		//
+		// NOTE: if array is of 0-length, returns false ????
+		all : function every(method, context) {
+			if (this.length == 0) return false;
+			
+			if (arguments.length == 0) {
+				for (var index = 0, len = this.length; index < len; index++) {
+					if (!this[index]) return false;
+				}
+			} else {
+				for (var index = 0, len = this.length; index < len; index++) {
+					var it = this[index];
+					if (!method.call(context, it, index, this)) return false;
+				}
 			}
 			return true;
 		},
-		
+
 		// return true if method call for AT LEAST ONE item() returns true-ish value
 		some : function some(method, context) {
-			for (var index = 0, len = this.length; index < len; index++) {
-				var it = this[index];
-				if (method.call(context, it, index, this)) return true;
+			if (arguments.length == 0) {
+				for (var index = 0, len = this.length; index < len; index++) {
+					if (this[index]) return true;
+				}
+			} else {
+				for (var index = 0, len = this.length; index < len; index++) {
+					var it = this[index];
+					if (method.call(context, it, index, this)) return true;
+				}
 			}
 			return false;
 		},
-				
-		
-		// 
+
+		// add a bunch of numbers together
+		// NOTE: does a parseFloat() on each item and only adds if a number
+		sum : function sum() {
+			var sum = 0;
+			for (var index = 0, len = this.length; index < len; index++) {
+				var number = parseFloat(this[index]);
+				if (!isNaN(number)) sum += number;
+			}
+			return sum;
+		},
+
+		//
 		//	the following routines only work if the list can be mutated
 		//
-	
+
 		// add one or more elements to this list
 		push : function push() {
 			for (var i = 0, len = arguments.length; i < len; i++) {
 				this.add(arguments[i]);
 			}
 		},
-	
+
 		// reverse the array in place
 		reverse : function reverse() {
 			var list = this.toArray();
@@ -149,7 +176,7 @@ extend(Array, {
 			return this;
 		}
 	}
-	
+
 });
 
 
@@ -161,7 +188,7 @@ Array.makeIteratable(Array);
 
 Array.addIterators({
 	where : Array.IteratorMethods.filter,
-	
+
 	// return a new array with each item in it only once
 	unique : function() {
 		var results = [];
@@ -182,14 +209,22 @@ Array.addIterators({
 		return results;
 	},
 
-	// invoke a named method on all items in the list
+	// invoke a method (or named method) on all items in the list
 	//	if item does NOT support that method, skips the call
-	invoke : function invoke(methodName, args) {
+	invoke : function invoke(method, args) {
 		var results = [];
-		for (var index = 0, len = this.length; index < len; index++) {
-			var it = this[index];
-			if (!it || !it[methodName]) continue;			
-			results[index] = it[methodName].apply(it, args);
+		if (typeof method == "function") {
+			for (var index = 0, len = this.length; index < len; index++) {
+				var it = this[index];
+				if (it == null) continue;
+				results[index] = method.apply(it, args);
+			}
+		} else {
+			for (var index = 0, len = this.length; index < len; index++) {
+				var it = this[index];
+				if (it == null || !it[method]) continue;
+				results[index] = it[method].apply(it, args);
+			}
 		}
 		return results;
 	},
@@ -212,6 +247,7 @@ Array.addIterators({
 	// set this list to the same as an otherList (including length)
 	// TODO: name?
 	setTo : function(otherList) {
+		if (otherList == null) return this;
 		for (var index = 0, len = otherList.length; index < len; index++) {
 			this[index] = otherList[index];
 		}
@@ -219,14 +255,16 @@ Array.addIterators({
 		return this;
 	},
 
-	// add one or more things to this array
-	add : function() {
-		for (var index = 0, len = argments.length; index < len; index++) {
-			this[this.length] = arguments[index];
-		}
+	// add it to this list
+	//	if index is specified, puts in that place and pushes later things forward
+	//	if index is not specified or is beyond length of array, just adds to end
+	add : function(it, index) {
+		if (typeof index != "number") index = this.length;
+		this.splice(index, 0, it);
 		return this;
 	},
 	
+
 	// remove all occurances of it from this list
 	// NOTE: only works if the list can be mutated
 	remove : function(it) {
@@ -238,7 +276,7 @@ Array.addIterators({
 		this.setTo(notIt);
 		return this;
 	},
-	
+
 	// replace all occurances of oldItem with newItem
 	replace : function(oldItem, newItme) {
 		for (var index = 0, len = this.length; index < len; index++) {

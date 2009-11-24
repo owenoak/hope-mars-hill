@@ -26,23 +26,15 @@ window.Inspector = {
 	showInherited : true,
 	showMethods : false,
 	visible : false,
-	
-//	template : Loader.loadText("{library}Inspector/Inspector.template"),	
-	
+
+//	template : Loader.loadText("{library}Inspector/Inspector.template"),
+
 	draw : function() {
-		this.element = Templates.get("Inspector").toElement(this);
+		this.element = Templates.Inspector.toElement(this);
 		this.element.animationSteps = 3;
 		this.element.animationDuration = 100;
 		document.body.add(this.element);
 		this.display = this.element.select("#InspectorDisplay");
-/*
-		var inputs = this.element.selectAll("input");
-		inputs.forEach(function(input) {
-			var name = input.getAttribute("name");
-			if (name == "showInherited") input.checked = this.showInherited;
-			if (name == "showMethods") input.checked = this.showMethods;
-		}, this);
-*/
 		this.element.fadeIn();
 	},
 
@@ -58,32 +50,31 @@ window.Inspector = {
 		else this.element.fadeIn();
 		this.visible = true;
 	},
-	
+
 	hide : function() {
 		if (this.element) this.element.fadeOut();
 		this.visible = false;
 	},
-	
-	
-	itemClick : function(targetNum, key, element) {
-		var parent = this.targets[targetNum],
-			target = parent[key]
-		;
-		this.inspect(target, targetNum+1);
 
-		// highlight the current item
-		var panel = this.getPanel(targetNum);
-		panel.selectAll("div").invoke("removeClass", ["selected"]);
-		
-		element.addClass("selected");
+	// click on a panel -- select the appropriate child in a new panel
+	panelClick : function(event, panel) {
+		try {
+			var targetNum = parseInt(panel.getAttribute("panelNum")),
+				target = this.targets[targetNum],
+				item = event.target.selectParent("[prop]"),
+				prop = item.getAttribute("prop")
+			;
+			this.inspect(target[prop], targetNum+1);
+
+			// highlight the current item
+			panel.selectAll(".Selected").removeClass("Selected");
+			item.addClass("Selected");
+		} catch (e) {}
 	},
-	
-	getPanel : function(num) {
-		return this.display.children[num];
-	},
-	
+
 	inspect : function(it, panelNum) {
 		if (!this.visible) this.show();
+		if (it == null) it = window;
 
 		if (typeof it == "string") {
 			try {
@@ -94,7 +85,7 @@ window.Inspector = {
 		}
 
 		if (!panelNum) panelNum = 0;
-		
+
 		// remove old panels
 		var parent = this.element.select("#InspectorDisplay");
 		for (var i = parent.children.length; i > panelNum; i--) {
@@ -103,7 +94,7 @@ window.Inspector = {
 
 		this.targets.length = this.panels.length = panelNum;
 		this.targets.push(it);
-		
+
 		var type = this.getType(it);
 		try {
 			switch (type) {
@@ -114,7 +105,7 @@ window.Inspector = {
 				case "String": 		return this.inspectString(it);
 				case "Number":		return this.inspectNumber(it);
 				case "Boolean":		return this.inspectBoolean(it);
-	
+
 				case "Window":
 				default:			return this.inspectObject(it);
 			}
@@ -122,8 +113,8 @@ window.Inspector = {
 			notify("couldn't show that!");
 		}
 	},
-	
-	
+
+/*
 	inspectObject : function(it) {
 		var output = [];
 		for (var prop in it) {
@@ -140,11 +131,25 @@ window.Inspector = {
 
 		this.outputPanel(output, "ObjectPanel");
 	},
-	
+*/
+	inspectObject : function(it) {
+		var items = [];
+		for (var prop in it) {
+			var value = it[prop];
+			if (typeof value == "function" && !this.showMethods) continue;
+			var inherited = !it.hasOwnProperty(prop);
+			if (Inspector.showInherited == false && inherited) continue;
+			var type = this.getType(value);
+			items.push([prop, value, type, inherited]);
+		}
+		this.sortItems(items);
+		this.outputPanel(items, "ObjectPanel");
+	},
+
 	inspectClass : function(it) {
 		this.inspectObject(it, "ClassPanel");
 	},
-	
+
 	inspectArray : function(it) {
 		// output numbered items
 		var output = [];
@@ -154,7 +159,7 @@ window.Inspector = {
 			var type = this.getType(value);
 			output.push(this.outputItem(type, i, value, false));
 		}
-		
+
 		// output properties
 		for (var prop in it) {
 			// skip number strings
@@ -169,11 +174,11 @@ window.Inspector = {
 		}
 		this.outputPanel(output, "ArrayPanel");
 	},
-	
+
 	inspectElement : function(it) {
-		this.inspectObject(it, "ElementPanel");	
+		this.inspectObject(it, "ElementPanel");
 	},
-	
+
 	inspectFunction : function(it) {
 		this.outputPanel([it], "FunctionPanel");
 	},
@@ -181,17 +186,24 @@ window.Inspector = {
 	inspectString : function(it) {
 		this.outputPanel([it.makeHTMLSafe()], "StringPanel");
 	},
-	
+
 	inspectNumber : function(it) {
 		this.outputPanel([it], "NumberPanel");
 	},
-	
+
 	inspectBoolean : function(it) {
 		this.outputPanel([it], "BooleanPanel");
 	},
-	
+
 
 	// utility
+
+	sortItems : function(items) {
+		items.sort(function(a,b) {
+			return (a[0]+"").toLowerCase() > (b[0]+"").toLowerCase();
+		});
+	},
+
 	getType : function(it) {
 		if 		(it instanceof Element) 	return "Element";
 		else if (it instanceof Array) 		return "Array";
@@ -203,18 +215,24 @@ window.Inspector = {
 		else if (it instanceof Window)		return "Object";
 		return "Object";
 	},
-	
+
+/*
 	outputPanel : function(items, className) {
 		className = "Panel"+ (className ? " "+className : "");
 		var panel = create("div", {
-									className:className, 
+									className:className,
 									panelNum:(this.targets.length-1),
 									html : "<div class='PanelBody'>"+items.join("\n")+"</div>",
-									parent : select("#InspectorDisplay")
+									parent : "#InspectorDisplay"
 								}
 						);
 	},
-	
+*/
+	outputPanel : function(items, className) {
+		var element = Template.toElement("Inspector.panel", className, items);
+		select("#InspectorDisplay").add(element);
+	},
+
 	outputItem : function(type, prop, value, inherited) {
 		var className = "Thing " + type + (inherited ? " Inherited" : ""),
 			click = "onclick='Inspector.itemClick("+(this.targets.length-1)+",\""+prop+"\", this)'"
@@ -223,7 +241,7 @@ window.Inspector = {
 		if (type == "Array") value = "(length "+value.length+")";
 		else if (type == "String") value = value.makeHTMLSafe();
 		else value = ""+value;
-		
+
 		return "<div sort='"+(""+prop).toLowerCase()+"' class='"+className+"' "+click+">\
 					<span class='name'>"+prop+"</span>:\
 					<span class='value'>"+value+"</span>\
@@ -237,4 +255,4 @@ window.inspect = console.inspect = function inspect(it) {
 }
 
 
-Inspector.inspect(window);
+//Inspector.inspect(window);

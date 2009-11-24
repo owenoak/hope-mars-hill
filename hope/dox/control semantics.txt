@@ -1,0 +1,72 @@
+Control Semantics
+
+Controls (Views?):
+	- can be created directly from XML
+		- control registers a 'tagName' at the class level?
+
+	- can be rendered as HTML or Canvases or...
+		- default is to draw from a template ?  or is this TemplatedWidget?
+		- have a parent 
+		- have a single top-level element(?)
+		
+	- can render inside parent or inline where it was created (check if page has finished loading?)
+
+	- have much the same semantics as elements (so they can be used interchangably)
+
+	- understand resize semantics
+
+	- are globally addressable (via 'globalRef')
+
+	- can remember state across page loads (via localStorage or some such)
+		 element.remember(key[, value])
+		 
+	- can point to a data object
+		- auto load of data object?
+		- bind to data objects as they are created/destroyed
+		- update when data object updates
+
+	- have 'children' but with different names for children 
+		- internally use 'children' but also have aliases for that function?
+
+	- has 'parts' which can be managed (eg: slider)
+
+	- have a way of listening to/broadcasting events
+		- observe & fire?
+
+
+ Nice To Haves:
+		- flyweight pattern? (eg: for use in a Grid)
+		- 
+	
+	
+ Leave Out:
+		- delayed draw
+		- defer
+
+ 
+ Think About:
+ 		- src property to auto-load contents?
+ 		- flags (see /js/hope (old school)/scripts/Control.js)
+
+
+
+Subclasses / Mixins:
+	- Expandable
+	- DataBound (?)
+	- Updating
+		- include testing URL semantics
+
+
+
+Properties:
+	- globalId		- string of 
+	- elementId		- id of main element
+	- element		- pointer to main element?
+	- selectable	- can they select text inside the control (affected by parents)
+	- className
+	- style
+	- visible
+	- enabled
+	- 
+	
+

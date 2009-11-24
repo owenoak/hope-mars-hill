@@ -10,7 +10,7 @@ extend(String.prototype, {
 	trim : String.prototype.trim || function() {
 		return this.replace(/^\s+/, '').replace(/\s+$/, '');
 	},
-	
+
 	capitalize : function() {
 		return this.charAt(0).toUpperCase() + this.substr(1);
 	},
@@ -19,6 +19,10 @@ extend(String.prototype, {
 		return Loader.normalizeUrl(this);
 	},
 	
+	makeLegalId : function() {
+		return this.replace(/[^\w$_]/g, "_")
+	},
+
 	makeQuoteSafe : function() {
 		return this.replace("'","\\'").replace("\n","\\n");
 	},
@@ -26,22 +30,31 @@ extend(String.prototype, {
 	makeDoubleQuoteSafe : function() {
 		return this.split('"').join('\\"').split("\n").join("\\n");
 	},
-	
+
 	makeHTMLSafe : function() {
 		return this.split('<').join('&lt;').split(">").join("&gt;");
 	},
-	
-	
+
+
 	isWhitespace : function() {
 		return this && this.match(/^\s+$/) != null;
 	},
-	
-	
+
+
+	startsWith : function(substring) {
+		return this.indexOf(substring) == 0;
+	},
+
+	endsWith : function(substring) {
+		var start = this.length - substring.length;
+		return start >= 0 && this.lastIndexOf(substring) == start;
+	},
+
 	// html manipulation
 	toElement : function() {
 		return document.create("div", {html:this}).firstChild;
 	},
-	
+
 	toElements : function() {
 		return document.create("div", {html:this}).children;
 	}
@@ -65,7 +78,7 @@ extend(String.prototype, {
 	getAttributes : function(object) {
 		if (!object) object = {};
 		var anyFound = false;
-		this.replace(String.attributeParser, 
+		this.replace(String.attributeParser,
 					function(match, key, skip1, skip2, quotedValue, value) {
 						anyFound = true;
 						object[key] = quotedValue || value
@@ -84,7 +97,7 @@ extend(String.prototype, {
 		for (var i = 0, len = items.length; i < len; i++) {
 			var item = items[i].split(keyDelim);
 			if (item.length != 2) continue;
-	
+
 			var key = item[0],
 				value = item[1]
 			;
@@ -95,8 +108,8 @@ extend(String.prototype, {
 		}
 		return output;
 	},
-	
-	
+
+
 	// Chop a string into pieces according to a pair of start and end regular expressions.
 	// 	<start> and <end> are RegExps with the "g" flag set.
 	//
@@ -116,11 +129,11 @@ extend(String.prototype, {
 		start.lastIndex = end.lastIndex = 0;
 		while (match = start.exec(this)) {
 			if (lastEnd != match.index) results.push(this.substring(lastEnd, match.index));
-			
+
 			// advance the end past the start
 			end.lastIndex = start.lastIndex;
-			var nested = false, 
-				endOfFirstStart = start.lastIndex, 
+			var nested = false,
+				endOfFirstStart = start.lastIndex,
 				endOfNestedStart = endOfFirstStart
 			;
 			while (endMatch = end.exec(this)) {
@@ -148,11 +161,11 @@ extend(String.prototype, {
 
 		// note the entire string the chop came from
 		results.source = this;
-		
+
 		return results;
 	},
 
-		
+
 	//
 	//	Parse tags from HTML
 	//
@@ -170,7 +183,7 @@ extend(String.prototype, {
 	//		callback(<tagName>, <attributesString>, <tagContents>)
 	//
 	//	e.g. to find all <h1>-<h6> tags in document order, do this:
-	//		document.body.innerHTML.forEachTag("h\\d", 
+	//		document.body.innerHTML.forEachTag("h\\d",
 	//			function(tagName, attrs, contents) { console.warn(tagName+":"+contents)}
 	//		);
 	//
@@ -182,6 +195,6 @@ extend(String.prototype, {
 			results.push(callback.call(thisObject, chop.start[1], chop.start[2], chop.middle));
 		});
 		return results;
-	}	
+	}
 });
 

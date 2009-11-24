@@ -1,29 +1,32 @@
 // ::
 // ::	Event -- changes to the native Event object & its prototype
 // ::
+
+
+// Add methods to the browser Event prototype.
 (function() {
 	Event.extend = extendPrototype;
-	
+
 	Event.extend({
 		stop: function() {
 		  this.preventDefault();
 		  this.stopPropagation();
 		  this.stopped = true;
 		}
-	
+
 	});
 })();
 
 
 
 //
-//	Keep track of event properties globally 
+//	Keep track of event properties globally
 //	 so we can access them without an 'event' object
 //
 
 (function() {
-	
-	// Global handler to peek during mousemove events (on capture phase) to keep track of 
+
+	// Global handler to peek during mousemove events (on capture phase) to keep track of
 	//	where the mouse pointer actually is at all times.
 	//
 	//	You can at any time check   Event.x and Event.y   to see where the mouse currently is.
@@ -32,9 +35,9 @@
 		Event.x = event.pageX;
 		Event.y = event.pageY;
 	}, true);
-	
-	
-	// Global handlers to peek during mousedown/mouseup events (on capture phase) 
+
+
+	// Global handlers to peek during mousedown/mouseup events (on capture phase)
 	//	to keep track of which mouse button is being pressed.
 	//
 	//	You can at any time check:
@@ -55,19 +58,19 @@
 		delete Event.leftButton;
 		delete Event.rightButton;
 	}
-	
+
 	document.addEventListener("mousedown", checkButton, true);
 	document.addEventListener("mouseup", buttonUp, true);
-	
-	
-	// Global handlers to peek during keydown/keup events (on capture phase) 
+
+
+	// Global handlers to peek during keydown/keup events (on capture phase)
 	//	to keep track of which special keys are being pressed
 	//
 	//	You can at any time check:
 	//			- Event.shiftKey
 	//			- Event.metaKey
 	//			- Event.commandKey  (alias for event.metaKey for Mac-oriented folks)
-	//			- Event.altKey		
+	//			- Event.altKey
 	//			- Event.optionKey   (alias for event.altKey for Mac-oriented folks)
 	//			- Event.ctrlKey
 	//	If the above is <true>, that button is down.
@@ -85,8 +88,8 @@
 //			"   alt:", Event.altKey
 //		);
 	}
-	
-	// set 
+
+	// set
 	document.addEventListener("keydown", checkSpecialKeys, true);
 	document.addEventListener("keyp", checkSpecialKeys, true);
 

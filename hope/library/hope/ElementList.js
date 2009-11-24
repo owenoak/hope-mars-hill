@@ -1,6 +1,6 @@
 // ::
 // :: ElementList
-// :: 
+// ::
 //		List of elements which can be manipulated (and constructed).
 //		Note that these methods are also installed on NodeList and NamedNodeMap
 //
@@ -21,7 +21,34 @@ var ElementListMethods = {
 			if (!list.contains(this.hopeType)) list.unshift(this.hopeType);
 		}
 		return list;
+	},
+
+
+	//
+	// methods that we can call on an entire list of elements
+	//
+
+	addClass : function(className) {
+		var args = arguments;
+		this.forEach(function(element) {
+			element.addClass.apply(element, args);
+		});
+	},
+
+	removeClass : function(className) {
+		var args = arguments;
+		this.forEach(function(element) {
+			element.removeClass.apply(element, args);
+		});
+	},
+
+	toggleClass : function(className) {
+		var args = arguments;
+		this.forEach(function(element) {
+			element.toggleClass.apply(element, args);
+		});
 	}
+
 
 
 };

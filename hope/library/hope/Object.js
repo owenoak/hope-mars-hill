@@ -6,10 +6,6 @@
 //				set fieldName(v){...}
 //			}
 //
-//	If you pass only one "source", "it" will be "this":
-//		in global scope, "this" will be the window
-//		when assigned as a method of an object, "this" will be that object
-
 function extend(it, source) {
 	if (!source) return it;
 	for (var key in source) {

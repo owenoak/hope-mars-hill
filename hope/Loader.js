@@ -1,6 +1,6 @@
 /*
 	Loader for HOPE system.
-	
+
 	Note that this loads the "hope" package by default, which will likely load other stuff.
 
 	TOTEST:
@@ -24,8 +24,9 @@
 // :: Loader ::
 // Loading files, scripts, stylesheets, etc
 window.Loader = {
-	loaderScriptName : "Loader.js",		// name of the script to use to derive the hope path
 
+	loaderCacheFileName	: "hope.js",	// name of this file if loaded from a cached (smooshed) file
+	loaderUrl : undefined,				// url of the loader (set in initialize() )
 	useCache : false,			// if true, we try to pull package (and other) files from the cache
 
 	ExtensionMap : {},			// map of extension -> loader for that extension
@@ -38,12 +39,12 @@ window.Loader = {
 	LoadCallbacks : {},			// methods to execute for things that need loading
 	Things : {},				// map of thing -> implementation files
 	Dependencies : {},			// map of thing -> dependencies
-	
+
 	UNLOADED : undefined,
 	LOADING : false,
 	LOADED : true,
 	LOAD_ERROR : "error",
-	
+
 	// initialize the loader (called below, right after Loader is declared)
 	initialize : function() {
 		var documentPath = (""+window.location).toLocation().fullpath,
@@ -56,95 +57,139 @@ window.Loader = {
 		// NOTE: assumes that this document is at the top-level for its 'app'
 		Loader.Paths.app = documentPath;
 
-		// look at all the scripts in the document
-		var scripts = document.querySelectorAll("script[src]");
-
-		Array.forEach(scripts, function(script) {
-			var src = Loader.absoluteUrl(script.src);
-			// mark them as loaded
-			Loader.setLoadResult(src);
-
-			// and note the hopePath if found
-			if (src.toLocation().file == Loader.loaderScriptName) {
-				basePath = Loader.absoluteUrl(src.toLocation().fullpath + "../");
-			}
-		});
+		// At this point the loader path will be the src of the last script in the document
+		// Figure out the base path relative to the URL of the loader file.
+		var loaderScript = Loader.getLastScript(),
+			loaderUrl = Loader.loaderUrl = loaderScript.src,
+			loaderPath = loaderUrl.toLocation().fullpath,
+			loaderFileName = loaderUrl.toLocation().file,
+			basePath = (loaderPath + "/../").toLocation().fullpath
+		;
 
 		//
 		// pre-determine a few package paths
 		//
-		
-		// base of hope system
+
+		// base of peers of hope system
 		Loader.Paths.base = basePath;
-		
-		// library directory
-		Loader.Paths.library = basePath + "hope/library/";
-		
+
 		// cache directory (for pre-compiled scripts)
 		Loader.Paths.cache = basePath + "cache/";
-		
+
 		// test directory
 		Loader.Paths.test = basePath + "test/";
-		
-		//
-		// add the load methods/etc to the window so we can call them directly
-		//	(NOTE: this may be removed at some point, so don't count on it for
-		//			more than debugging purposes)
-		//
-//		for (var name in Loader) {
-//			var it = Loader[name];
-//			if (typeof it == "function") window[name] = it;
-//		}
+
+		// base of hope system
+		Loader.Paths.hope = loaderPath;
+
+		// library directory
+		Loader.Paths.library = loaderPath + "library/";
+
+
+		// any inlined script in the Loader script element should be executed
+		//	after the loader finishes loading.
+		var loaderCallback = loaderScript.innerHTML;
+		if (typeof loaderCallback == "string") loaderCallback = new Function(loaderCallback);
+
+		// if there is a 'packages' attribute of the loader script,
+		//	load those packages after the hope package finshes loading
+		//	(and call the loaderCallback once those packages have been loaded)
+		var packages = loaderScript.getAttribute("packages");
+		if (packages) {
+			packages = packages.split(/\s*,\s*/);
+			Loader.whenLoaded("package:hope", function() {
+				Loader.loadPackages(packages, loaderCallback);
+			});
+		}
+		// otherwise just execute the loaderCallback when the hope package has been loaded
+		else {
+			if (loaderCallback) {
+				Loader.whenLoaded("package:hope", loaderCallback);
+			}
+		}
+
+		// set things up so we mark all inlined script tags as loaded
+		Loader.whenLoaded("document", Loader.markPageElementsAsLoaded);
+
+		// If we are not loading from cache,
+		//	load the hope package now with a bootstrap package loader.
+		//	(The hope package will be initialized as a full package later.)
+		if (loaderFileName != Loader.loaderCacheFileName) {
+			Loader.loadHopePackage();
+		}
 	},
-	
+
 	// bootstrap load hope package
 	loadHopePackage : function() {
 		// bootstrap load of scripts in the "hope" package
 		//	(we will initialize it as a Package later)
-		var hopePath = Loader.absoluteUrl("{library}hope/"),
-			hopePkgUrl = hopePath + "hope.package.xml",
+		var pkgPath = Loader.absoluteUrl("{library}hope/"),
+			hopePkgUrl = pkgPath + "hope.package.xml",
 			xml = Loader.loadXML(hopePkgUrl)
 		;
 		Loader.setLoadResult(hopePkgUrl, xml);
 
 		var	files = xml.querySelectorAll("[url][preload]"),
-			urls = Loader.absoluteUrls(files, hopePath)
+			urls = Loader.absoluteUrls(files, pkgPath)
 		;
 
-		Loader.loadFiles(urls, 
-			function callback() {	
+		Loader.loadFiles(urls,
+			function callback() {
 				Loader._debug("loadHopePackage(): Done with bootstrap -- creating hope package");
-				Package.load(hopePkgUrl,null, null, xml);
-			}, 
+				Package.load(hopePkgUrl, null, null, xml);
+			},
 			function errback(url, error) {
 				Loader._error("loadHopePackage(): Error loading ",url,": ",error);
-			}, 
+			},
 			true	// skip extensions we don't understand (we'll pick them up later)
 		);
 	},
 
-	
+	// mark all script elements as loaded (and execute their callback functions)
+	markPageElementsAsLoaded : function() {
+		var scripts = document.querySelectorAll("script[src]");
+		Array.forEach(scripts, function(script) {
+			var src = Loader.absoluteUrl(script.src);
+			// mark them as loaded
+			if (!Loader.Loaded[src]) Loader.onload(src, script);
+		});
+
+		var styles = document.querySelectorAll("link[rel=stylesheet]");
+		Array.forEach(styles, function(style) {
+			var src = Loader.absoluteUrl(style.href);
+			// mark them as loaded
+			if (!Loader.Loaded[src]) Loader.onload(src, style);
+		});
+	},
+
+	// return the last script in the document
+	//	which should be the currently running script, at least during load
+	getLastScript : function() {
+		var scripts = document.querySelectorAll("script[src]");
+		return scripts[scripts.length-1];
+	},
+
 	// mark a url (or class name or...) as loaded
 	// you can pass a single string or an array of strings
 	setLoadResult : function(it, value) {
 		if (value == undefined) value = Loader.LOADED;
-		
+
 		if (it.forEach) {
 			return it.map(function(it){return Loader.setLoadResult(value)});
 		}
-		
+
 		if (it.indexOf("{") > -1) it = Loader.absoluteUrl(it);
 		return (Loader.Loaded[it] = value);
 	},
-	
+
 	// return true if it has already been loaded or it is currently loading now
 	// you can pass an array in which case returns true only if all are loaded
 	isLoaded : function(it) {
-		if (it.every) return it.every(Loader.isLoaded);
+		if (it.all) return it.all(Loader.isLoaded);
 		return Loader.Loaded[it];
 	},
-	
-	
+
+
 	// given a list of urls (and maybe a base path)
 	//	return the absolute urls of any items which have not been loaded
 	unloadedFiles : function(urls, base) {
@@ -156,25 +201,46 @@ window.Loader = {
 		});
 		return (unloaded.length == 0 ? null : unloaded);
 	},
-	
-	// add a method to be called when something finishes loading
-	addLoadCallback : function(what, callback) {
-		if (!Loader.LoadCallbacks[what]) Loader.LoadCallbacks[what] = [];
-		Loader.LoadCallbacks[what].push(callback);
-	},
-	
-	executeLoadCallbacks : function(what) {
-		var callbacks = Loader.LoadCallbacks[what];
-		if (callbacks) {;
-//console.group("executing load callbacks for "+what);
-			callbacks.forEach(function(callback) {
-//	console.warn("executing callbacks:\n"+callback);
-				callback();
-			});
-//console.groupEnd();
+
+	// Add a method to be called when something finishes loading.
+	//	<it> will generally be a URL or a conceptual name like "document" or "package:hope".
+	//	<callback> is a function or a string to eval.
+	whenLoaded : function(it, callback) {
+		if (it == document) it = "document";
+		if (typeof callback == "string") callback = new Function(callback);
+
+		// if it has already been loaded, just execute the callback
+		if (Loader.isLoaded(it)) {
+			callback();
+		} else {
+			if (!Loader.LoadCallbacks[it]) Loader.LoadCallbacks[it] = [];
+			Loader.LoadCallbacks[it].push(callback);
 		}
 	},
-	
+
+	// Execute the on load callback(s) for something (and mark it as loaded).
+	//	<it> will generally be a URL or a conceptual name like "document" or "package:hope".
+	//	<loadResult> (optional) is generally the thing that was instantiated from this load.
+	onload : function(it, loadResult) {
+		Loader._debug(".onload(",it,",",loadResult,")");
+		// mark the thing as loaded
+		Loader.setLoadResult(it, loadResult);
+
+		// and execute any load callbacks
+		var callbacks = Loader.LoadCallbacks[it];
+		if (callbacks) {;
+			//console.group("executing load callbacks for "+it);
+			callbacks.forEach(function(callback) {
+				//console.warn("executing callbacks:\n"+callback);
+				callback();
+			});
+			//console.groupEnd();
+
+			// clear the list of callbacks on the off-chance that our "onload" is fired again
+			delete Loader.LoadCallbacks[it];
+		}
+	},
+
 	// load a file as text (will load same url more than once)
 	loadText : function (url, defer, callback, errback, errHint) {
 		url = Loader.absoluteUrl(url);
@@ -182,7 +248,7 @@ window.Loader = {
 		var callbackWhenDone = function () {
 			// wait until 'Completed' if a synchronous call
 			if (request.readyState != 4) return;
-			
+
 			// error state
 			if (request.status < 200 || request.status > 300) {
 				if (errback) return errback(url);
@@ -207,7 +273,7 @@ window.Loader = {
 		var callbackWhenDone = function () {
 			// wait until 'Completed' if a synchronous call
 			if (request.readyState != 4) return;
-			
+
 			// error state
 			if (request.status < 200 || request.status > 300) {
 				if (errback) return errback(url);
@@ -223,32 +289,32 @@ window.Loader = {
 		request.send();
 		if (!defer) return callbackWhenDone();
 	},
-	
-	
+
+
 	// load one or more classes, JS or CSS files and execute callback when they are all done
 	load : function(things, callback, errback) {
 		// get the dependencies of the things passed in
 		//	which will be all the URLs (or manifest entries) needed to load the things
-		
+
 		// errback to swallow (but log) errors
 		if (!errback) errback = function(error){	Loader._error(error);	};
-		
+
 		var urls = Loader.getDependencies(things);
 		return this.loadFiles(urls, callback, errback);
 	},
 
-	
-	
+
+
 	// set up a new loadable thing
-	//	
-	//	
+	//
+	//
 	//	NOTE: assumes the loadMethod:
 	//			- throws an exception if it couldn't load the file
 	//			- does NOT do any checking to see if that file is already loaded
 	//			- takes the following arguments:
 	//
 	//				function loadSomething(url, defer, callback, errback)
-	//		where		
+	//		where
 	//					url = any valid url
 	//					defer = true means we don't block waiting for this to finish
 	//						- note that 'defer' may have penalties (such as making debugging harder)
@@ -260,7 +326,7 @@ window.Loader = {
 	//		and returns
 	//					if deferring, Loader.LOADING
 	//					if not deferring, actual file contents from the load
-	//	
+	//
 	makeLoadable : function(info) {
 		var loadOne = "load" + info.type,
 			loadMany = "load" + (info.plural ? info.plural : info.type + "s")
@@ -277,7 +343,7 @@ window.Loader = {
 					if (errback) return errback(e, url);
 					throw e;
 				}
-			}		
+			}
 
 			Loader[loadMany] = info.loadMany = function loadMany(urls, callback, errback) {
 				var results = {},
@@ -303,7 +369,7 @@ window.Loader = {
 					throw e;
 				}
 			}
-			
+
 			Loader[loadMany] = info.loadMany = function loadMany(urls, callback, errback) {
 				var results = {};
 				Array.forEach(urls, function(url) {
@@ -318,16 +384,16 @@ window.Loader = {
 				return results;
 			}
 		}
-		
+
 		// now store the info to call this loader under each extension passed in
 		if (info.extensions) {
 			if (typeof info.extensions == "string") info.extensions = [info.extensions];
-			info.extensions.forEach(function(extension) { 
+			info.extensions.forEach(function(extension) {
 				Loader.ExtensionMap[extension] = info;
 			});
 		}
 	},
-		
+
 	// create a function to load each of the URLs in turn and call callback when done
 	// EITHER:  urls is a list of strings and loadMethod is a function to load each one
 	//	   OR:	urls is a list of [url, loadMethod] and loadMethod is ignored
@@ -344,7 +410,7 @@ window.Loader = {
 				throw error;
 			}
 		}
-		
+
 		var index = -1;
 		function loadNext() {
 			// if we're at the end of the list, call the callback and we're done
@@ -368,8 +434,8 @@ window.Loader = {
 			Loader.Loaded[url] = results[url] = loadMethod(url, loadNext, loaderErrback);
 		}
 		return loadNext;
-	},	
-	
+	},
+
 	// load a bunch of files ONLY ONCE according to their extension
 	//	returns true if everything was already loaded or has been loaded synchronously
 	//	returns false if at least one thing could not be loaded synchronously
@@ -401,35 +467,35 @@ window.Loader = {
 				;
 				if (!info && skipUnknownExtensions != true) {
 					results[url] = Loader.Loaded[url] = Loader.loadText(url);
-					
+
 				} else if (info.defer != true) {
 					results[url] = info.loadOne(url);
-					
+
 				} else {
 					asyncLoads.push([url, info.loadOne]);
 					Loader.Loaded[url] = Loader.LOADING;
 				}
 			} catch (e) {
 				// If errback is defined, call it
-				//		If it (re)throws an exception, we'll error out of loadFiles() entirely	
+				//		If it (re)throws an exception, we'll error out of loadFiles() entirely
 				if (errback) errback(e, url);
 				// if errback is note defined, throw the error
 				else		 throw e;
 			}
 		});
-			
+
 		// if there is nothing to load asynchronously, we're done!
 		if (asyncLoads.length == 0) {
 			if (callback) callback(results, urls);
 			return true;
-		} 
+		}
 
 		// load asynchronous things one at a time
 		var loadNext = Loader._makeLoadingQueue(asyncLoads, null, callback, errback, results);
-		loadNext();	
+		loadNext();
 		return false;		// signal that not everything was loaded
-	},	
-	
+	},
+
 
 	// insert a bunch of JS as a <script> tag
 	//	NOTE: this seems to ALWAYS swallow parse errors in Firefox
@@ -445,17 +511,17 @@ window.Loader = {
 		return script;
 	},
 
-	
-	
+
+
 	// load a library package
 	loadLibrary : function(libraryName, callback) {
 		Loader.loadPackage("{library}"+libraryName, callback);
 	},
-	
+
 	pathTo : function(pkgName) {
 		return Loader.Paths[pkgName];
 	},
-	
+
 	getDependencies : function(things) {
 		if (typeof things == "string") things = [things];
 		var deps = [];
@@ -482,14 +548,14 @@ window.Loader = {
 		return deps;
 	},
 
-	
+
 	// utility methods
 
 	normalizeUrl : function(url) {
 		// if we were passed a manifest entry, it will have a "url" property
 		if (typeof url == "object" && url.url) url = url.url;
 		// TOWARN
-		
+
 		if (url.indexOf(".") == -1 && url.indexOf("//") == -1) return url;
 		url = url.replace(/\/\.\/(\.\/)*/g,"/").replace(/([^:])\/\/+/g, "$1/");
 		url = url.split("/");
@@ -499,7 +565,7 @@ window.Loader = {
 		}
 		return url.join("/");
 	},
-	
+
 	_namedPathMatcher : /\{(.*)\}/,
 	expandNamedPath : function(url) {
 		var match = url.match(Loader._namedPathMatcher);
@@ -509,9 +575,9 @@ window.Loader = {
 		}
 		return url;
 	},
-	
+
 	_absoluteUrlCache : {},
-	
+
 	// convert the url to an absolute url using the location as a base
 	// default base is the location of the loader file (?)
 	absoluteUrl : function(url, base) {
@@ -523,9 +589,9 @@ window.Loader = {
 
 		var cacheName = url + base;
 		// if we've already munged at this one before, return it
-		if (Loader._absoluteUrlCache[cacheName]) 
+		if (Loader._absoluteUrlCache[cacheName])
 			return Loader._absoluteUrlCache[cacheName];
-		
+
 		url = Loader.expandNamedPath(url);
 
 		if (url.indexOf("http:") != 0 && url.indexOf("file:") != 0) {
@@ -537,13 +603,13 @@ window.Loader = {
 				url = base.toLocation().fullpath + url;
 			}
 		}
-		
+
 		return (Loader._absoluteUrlCache[cacheName] = Loader.normalizeUrl(url));
 	},
-	
+
 	absoluteUrls : function(urls, base) {
 		if (typeof urls == "string") urls = [urls];
-		
+
 		return Array.map(urls, function(url) {
 			return Loader.absoluteUrl(url, base);
 		});
@@ -558,14 +624,14 @@ window.Loader = {
 			if (cookie[0] == key) return cookies[i].substr(key.length);
 		}
 	},
-	
+
 	toString : function() {
 		return "[Loader]";
 	},
-	
+
 	//
 	//	debugging shims
-	//		these will be replace by Debuggable as soon as it loads
+	//		these will be replace by Debuggable as soon as it loads (it's first)
 	//		so we'll eat any messages until that shows up
 	//
 	_debug : function() {},
@@ -577,16 +643,17 @@ window.Loader = {
 
 // add a loader for ".js" files
 Loader.makeLoadable({
-	type:"Script", 
-	extensions: ".js", 
+	type:"Script",
+	extensions: ".js",
 	defer : true,
 	load : function loadScript(url, callback, errback) {
 //console.info("loadScript() ",url)
+		url = Loader.absoluteUrl(url);
+		if (callback) Loader.whenLoaded(url, callback);
 		var script = document.createElement("script");
 		script.onload = function() {
 			Loader._debug("loadScript(",url,"): done loading script.");
-			Loader.Loaded[url] = script;
-			if (callback) callback();
+			Loader.onload(url, script);
 		};
 		script.setAttribute("src", url);
 		if (errback) script.onerror = errback;
@@ -600,8 +667,8 @@ Loader.makeLoadable({
 // add a simple ".css" file loader
 //	this will be enhanced in Stylesheet.js
 Loader.makeLoadable({
-	type:"Stylesheet", 
-	extensions: ".css", 
+	type:"Stylesheet",
+	extensions: ".css",
 	load : function loadStylesheet(url) {
 		Loader._debug("loadStyleshet(",url,"): including stylesheet.");
 		var sheet = document.createElement("link");
@@ -627,7 +694,7 @@ Loader.makeLoadable({
 //	where you can query all of the href, prefix, path, etc below (as properties)
 function Location(url) {
 	if (typeof url != "string") throw "Location must be initialized with a string: "+url;
-	
+
 	if (Location.Cache[url]) {
 		this.match = Location.Cache[url].match;
 	} else {
@@ -645,18 +712,18 @@ Location.prototype = {
 	get href()		{ return "" + this.prefix + this.path + this.file + this.search + this.hash },
 	get fullpath()	{ return "" + this.prefix + this.path },
 	get prefix()	{ return this.match[2] || "" },
-	get protocol()	{ return this.match[3] || "" },								
-	get host()		{ return this.match[4] || "" },								
-	get hostname()	{ return this.match[5] || "" },								
-	get port()		{ return this.match[6] || "" },								
-	get pathname()	{ return "" + this.path + this.file}, 
-	get path()		{ return this.match[7] || "" },								
-	get file()		{ return this.match[8] || "" },								
-	get filename()	{ return this.match[9] || "" },								
-	get extension()	{ return this.match[10] || "" },								
-	get search()	{ return this.match[11] || "" },								
+	get protocol()	{ return this.match[3] || "" },
+	get host()		{ return this.match[4] || "" },
+	get hostname()	{ return this.match[5] || "" },
+	get port()		{ return this.match[6] || "" },
+	get pathname()	{ return "" + this.path + this.file},
+	get path()		{ return this.match[7] || "" },
+	get file()		{ return this.match[8] || "" },
+	get filename()	{ return this.match[9] || "" },
+	get extension()	{ return this.match[10] || "" },
+	get search()	{ return this.match[11] || "" },
 	get hash()		{ return this.match[12] || "" },
-	get parameters(){ 
+	get parameters(){
 		if (!this.search) return undefined;
 		var params = {};
 		this.search.split("&").forEach(
@@ -687,16 +754,28 @@ String.prototype.toLocation = function() {
 // :: Array hack ::
 //	- make sure Array.forEach and Array.map are defined so we can use them below
 if (!Array.forEach) {
-	Array.forEach = function forEach(list, callback, context) {	
+	Array.forEach = function forEach(list, callback, context) {
 		return Array.prototype.forEach.call(list, callback, context);
 	}
-	Array.map = function map(list, callback, context) {	
+	Array.map = function map(list, callback, context) {
 		return Array.prototype.map.call(list, callback, context);
 	}
 }
 
-// initialize the Loader
-Loader.initialize();
 
-// TODO: if preloading, this should not be here!
-Loader.loadHopePackage();
+// Add a 'document.whenLoaded' handler to set up global page-level callbacks...
+document.whenLoaded = function(handler) {
+	Loader.whenLoaded("document", handler);
+}
+// ... and fire that event when the page finishes loading.
+// 	DOMContentLoaded event fires when the browser is finished loading scripts
+//	(but not necessarily images) in FF and later versions of WebKit.
+document.addEventListener("DOMContentLoaded",
+	function(){
+		Loader.onload("document");
+	}, false
+);
+
+
+// Initialize the Loader.  This will automatically load the {library}/hope package.
+Loader.initialize();

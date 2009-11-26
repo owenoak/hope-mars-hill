@@ -32,7 +32,7 @@
 			this.removeAttribute("observes");
 			this.data.observing = [];
 
-			eventNames.split(" ").forEach(function(item) {
+			eventNames.split("|").forEach(function(item) {
 				item = item.split(":");
 				var eventName = item[0],
 					methodName = item[1] || "on"+eventName
@@ -67,7 +67,7 @@
 				}
 
 				data.observing.push(eventName);
-				this.setAttribute("observing", data.observing.join(" "));
+				this.setAttribute("observing", data.observing.join("|"));
 			}
 
 			// store handler+target+args so we can call it later
@@ -104,12 +104,12 @@
 			return false;
 		},
 
-		// Return the default target of our events as set in our "eventTarget" attribute.
+		// Return the default target of our events as set in our "target" attribute.
 		//	(This will generally be a Control of some sort.)
-		// If no "eventTarget" was specified, defaults to this element itself.
+		// If no "target" was specified, defaults to this element itself.
 		get eventTarget() {
 			if (this.data.eventTarget === undefined) {
-				var target = this.getAttribute("eventTarget");
+				var target = this.getAttribute("target");
 				this.data.eventTarget = (target ? hope.get(target) : null);
 			}
 			return this.data.eventTarget || this;

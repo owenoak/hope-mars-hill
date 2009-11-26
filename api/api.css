@@ -1,0 +1,168 @@
+/* default.css */
+body
+{
+	font: 12px Verdana, Arial, Helvetica, sans-serif;
+}
+
+TD {
+	vertical-align:top;
+}
+
+A {
+	color:black;
+	text-decoration:none;
+}
+
+A:hover {
+	color:blue;
+	text-decoration:underline;
+}
+
+
+H1 {
+	background-color: #f3f3f3;
+	margin:0px;
+	padding:5px;
+	width:100%;
+}
+
+H2 {
+	background-color: #f3f3f3;
+	margin:0px;
+	padding:5px;
+}
+
+H3 {
+	background-color: #f3f3f3;
+	margin:0px;
+	padding:5px;
+}
+
+H4 {
+	background-color: #f3f3f3;
+	margin:0px;
+	padding:5px;
+}
+
+
+
+/* regions of the page */
+
+
+TABLE#outer {
+	width:98%;
+	margin:1%;
+	border:1px solid red;
+}
+
+TD#index {
+	width:200px;
+	background-color: #F3F3F3;
+	padding: 8px;
+	vertical-align:top;
+}
+
+TD#content {
+	vertical-align:top;
+	padding:8px;
+	border:1px solid blue;
+}
+
+DIV.fineprint {
+	border-top:1px solid #eee;
+	margin-top:10px;
+	padding-top:5px;
+	font-size:.7em;
+	color:#666;
+	text-align:center;
+}
+DIV.fineprint A {
+	text-decoration:none;
+}
+
+
+
+
+/* classes of things */
+
+
+
+	DIV.attribute {
+		font-size:.8em;
+		color:#333;
+	}
+
+
+/* methods */
+	TABLE.method {
+		width:96%;
+		margin:5px 2%;
+	}
+
+	TD.title {
+		font-weight:bold;
+		background:#f3f3f3;
+		border-right:1px solid #f3f3f3;
+	}
+	
+	TD.title .memberOf {
+		font-weight:normal;
+	}
+	
+	TD.title .signature {
+		font-weight:normal;
+		color:#666;
+	}
+
+	TD.title .returns {
+		font-weight:normal;
+		color:#666;
+	}
+
+
+	TABLE.method TD.description {
+		font-size:.8em;
+		color:#333;
+		padding-left:2em;
+	}
+
+
+	TABLE.method TD.attributes {
+		font-size:.8em;
+		color:#333;
+	}
+
+
+	TABLE.parameters {
+		width:96%;
+		margin:3px 2%;
+		border:1px solid #f3f3f3;
+		border-bottom-width:0px;
+	}
+	
+	TABLE.parameters TD.parameter {
+		font-size:.8em;
+		font-weight:bold;
+		border-right:1px solid #f3f3f3;
+		border-bottom:1px solid #f3f3f3;
+	}
+
+	TABLE.parameters TD.paramAttributes {
+		font-style:italic;
+		color:#666;
+		font-size:.8em;
+		border-right:1px solid #f3f3f3;
+		border-bottom:1px solid #f3f3f3;
+	}
+
+	TABLE.parameters TD.paramAttributes A {
+		color:#666;
+		text-decoration:none;
+	}
+
+	TABLE.parameters TD.paramDescription {
+		font-size:.8em;
+		color:#333;
+		border-right:1px solid #f3f3f3;
+		border-bottom:1px solid #f3f3f3;
+	}

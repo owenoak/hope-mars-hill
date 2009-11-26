@@ -1,0 +1,802 @@
+
+<html>
+<head>
+	<title>{hope} : Location</title>
+	<LINK REL="stylesheet" HREF="../api.css" TYPE="text/css">
+</head>
+
+<body>
+<!-- ============================== header ================================= -->	
+	<!-- begin header.html -->
+<!-- end header.html -->
+
+
+<!-- ============================== classes index ============================ -->
+<table class='outer'><tr>
+	<td id="index">
+		<!-- begin publish.classesIndex -->
+		<div align="center"><a href="../index.html">Class Index</a>
+| <a href="../files.html">File Index</a></div>
+<hr />
+<h2>Classes</h2>
+<ul class="classList">
+	
+	<li><i><a href="../symbols/_global_.html">_global_</a></i></li>
+	
+	<li><a href="../symbols/Array.html">Array</a></li>
+	
+	<li><a href="../symbols/Loader.html">Loader</a></li>
+	
+	<li><a href="../symbols/Location.html">Location</a></li>
+	
+	<li><a href="../symbols/String.html">String</a></li>
+	
+</ul>
+<hr />
+		<!-- end publish.classesIndex -->
+	</td>
+	
+	<td id="content" width='*'>
+<!-- ============================== class title ============================ -->
+		<h1 class="classTitle">
+			
+			Class Location
+		</h1>
+
+<!-- ============================== class summary ========================== -->			
+		<p class="description">
+			
+		
+			
+			
+			
+				<br /><i>Defined in: </i> <a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a>.
+			
+		</p>
+
+
+<!-- ============================== constructor summary ==================== -->			
+
+	<div class='constructor '>
+		<h3 class='constructor'>
+			<span class='attributes'></span>
+			<span class='title'>
+				Location
+				(url)				
+			</span>
+		</h3>
+		<div class="description">
+			
+			Breaks a URL up into pieces (much like window.location).
+		</div>
+
+		
+			<h4 class='parameters'>Parameters:</h4>
+			<table class='parameters'>
+			
+				
+					<tr><td class='parameter'>
+							<span class='title'>url</span>
+							<span class='attributes'>
+								<span class="type"><a href="../symbols/String.html">String</a></span>
+								
+								
+							</span>
+						</td>
+						<td class='description'>URL to convert into a location object.</td>
+					</tr>
+				
+			
+			
+			
+			</table>
+		
+
+		
+			
+				<pre class="example code">var loc = new Location('http://www.server.com:81/path/to/a/file.xml?p1=v1&amp;p2=v2#hash');</pre>
+			
+		
+
+
+		
+
+		
+
+		
+		
+
+		
+
+	</div><!-- class='constructor' -->
+
+
+
+
+<!-- ============================== properties summary ===================== -->
+
+	
+	
+			<h4 class='fields'>Fields:</h4>
+			<table class='fields'>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							<a href="../symbols/Location.html#extension">extension</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Extension (including the dot):
+
+					
+
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							<a href="../symbols/Location.html#file">file</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Filename including extension:
+
+					
+
+					
+						
+							<pre class="example code">file.xml</pre>
+						
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							<a href="../symbols/Location.html#filename">filename</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Filename without extension:
+
+					
+
+					
+						
+							<pre class="example code">file</pre>
+						
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							<a href="../symbols/Location.html#fullpath">fullpath</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Full path, including protocol and server:
+
+					
+
+					
+						
+							<pre class="example code">http://www.server.com:81/path/to/a/</pre>
+						
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							<a href="../symbols/Location.html#hash">hash</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Hash string (including `#`):
+
+					
+
+					
+						
+							<pre class="example code">#hash</pre>
+						
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							<a href="../symbols/Location.html#host">host</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Hostname + port:
+
+					
+
+					
+						
+							<pre class="example code">www.server.com:81</pre>
+						
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							<a href="../symbols/Location.html#hostname">hostname</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Hostname without port:
+
+					
+
+					
+						
+							<pre class="example code">www.server.com</pre>
+						
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							<a href="../symbols/Location.html#href">href</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Full href:
+
+					
+
+					
+						
+							<pre class="example code">http://www.server.com:81/path/to/a/file.xml?p1=v1&amp;p2=v2#hash</pre>
+						
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							<a href="../symbols/Location.html#parameters">parameters</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Object of `paramName` -> `value` for each parameter:
+
+					
+
+					
+						
+							<pre class="example code"></pre>
+						
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							<a href="../symbols/Location.html#path">path</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Path without file name:
+
+					
+
+					
+						
+							<pre class="example code">/path/to/a/</pre>
+						
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							<a href="../symbols/Location.html#pathname">pathname</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Path including file name:
+
+					
+
+					
+						
+							<pre class="example code">/path/to/a/file.xml</pre>
+						
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							<a href="../symbols/Location.html#port">port</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Port:
+
+					
+
+					
+						
+							<pre class="example code">81</pre>
+						
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							<a href="../symbols/Location.html#prefix">prefix</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Protocol and server:
+
+					
+
+					
+						
+							<pre class="example code">http://www.server.com:81</pre>
+						
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							<a href="../symbols/Location.html#protocol">protocol</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Protocol (http or file, etc):
+
+					
+
+					
+						
+							<pre class="example code">http:</pre>
+						
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							<a href="../symbols/Location.html#search">search</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Search string (including `?`):
+
+					
+
+					
+						
+							<pre class="example code">?p1=v1&amp;p2=v2</pre>
+						
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+		</table>
+	
+	
+	
+
+
+
+<!-- ============================== methods summary ======================== -->
+
+	
+	<h2>Methods</h2>
+	
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						blarg<span class='signature'>(a)</span>
+	
+						
+							
+								
+									<span class='returns'><a href="../symbols/String.html">String</a></span>
+								
+							
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Full href:</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>a</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										
+										
+									</td>
+									<td class='paramDescription'>Param 'a'.</td>
+								</tr>
+						
+					
+
+					
+						
+								<tr><td class='parameter'>Returns:</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+									</td>
+									<td class='paramDescription'></td>
+								</tr>
+						
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+				<tr>
+					<td colspan='2'>
+				
+					<pre class="example code">var loc = new Location('http://www.server.com:81/path/to/a/file.xml?p1=v1&amp;p2=v2#hash');</pre>
+				
+					</td>
+				</tr>
+			
+
+			</table>
+		
+	
+	
+
+
+		
+<!-- ============================== events summary ======================== -->
+		
+
+
+
+<!-- ============================== event details ========================= -->		
+		
+		
+	</td><!-- id='content' -->
+</tr></table>
+
+
+	
+<!-- ============================== footer ================================= -->
+	<!-- begin footer.html -->
+<div class="fineprint" style="clear:both">
+	
+	Generated on Wed Nov 25 2009 18:03:57 GMT-0500 (EST) by <a href='http://code.google.com/p/jsdoc-toolkit/'>JsDoc Toolkit</a>
+</div>
+<!-- end footer.html -->
+
+</body>
+</html>

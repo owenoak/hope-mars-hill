@@ -76,7 +76,7 @@
 
 	// special function to subclass array (since there's no better way to do it that works)
 	function subclassArray(ClassName) {
-		var iframe = document.createElement("iframe").set({position:"absolute",left:-1000,top:-1000});
+		var iframe = document.createElement("iframe").setStyle({position:"absolute",left:-1000,top:-1000});
 		document.body.appendChild(iframe);
 
 		var frameDoc = frames[frames.length - 1];
@@ -182,7 +182,8 @@
 		makeGloballyAddressable : function() {this.constructor.makeGloballyAddressable(this)},
 
 		toString : function toString() {
-			var name = (this == this.constructor.prototype ? "prototype" : this.globalId || this.id || this.name);
+			if (this.globalRef) return "["+this.globalRef+"]";
+			var name = (this == this.constructor.prototype ? "prototype" : this.id || this.name);
 			return "["+this.constructor.ClassName+" "+name +"]";
 		},
 
@@ -196,7 +197,6 @@
 				}
 				return;
 			}
-
 			var setter = Setters[key] || (Setters[key] = "set"+key.capitalize());
 			if (this[setter]) 	this[setter](value);
 			else				this[key] = value;
@@ -220,6 +220,33 @@
 			observers.forEach(function(observer) {
 				if (observer[methodName]) observer[methodName].apply(observer, arguments);
 			});
+		},
+		
+		
+		//
+		// defer some action and keep extending deferral period if called again before timer goes off
+		//
+		delay : function(callback, interval, timerName) {
+			if (typeof callback == "string") callback = this[callback];
+			if (timerName) this.clearDelay(timerName);
+			if (!interval) return callback.apply(this);
+
+			var timer = setTimeout(
+					function(){
+						this.clearDelay(timerName);
+						callback.apply(this);
+					}.bind(this),
+					(interval || .1) * 1000
+				);
+			if (timerName) this._timers[timerName] = timer;
+		},
+		
+		clearDelay : function(timerName) {
+			if (!this._timers) this._timers = {};
+			if (timerName) {
+				clearTimeout(this._timers[timerName]);
+				delete this._timers[timerName];
+			}
 		}
 		
 	}

@@ -1,0 +1,2120 @@
+
+<html>
+<head>
+	<title>{hope} : Loader</title>
+	<LINK REL="stylesheet" HREF="../api.css" TYPE="text/css">
+</head>
+
+<body>
+<!-- ============================== header ================================= -->	
+	<!-- begin header.html -->
+<!-- end header.html -->
+
+
+<!-- ============================== classes index ============================ -->
+<table class='outer'><tr>
+	<td id="index">
+		<!-- begin publish.classesIndex -->
+		<div align="center"><a href="../index.html">Class Index</a>
+| <a href="../files.html">File Index</a></div>
+<hr />
+<h2>Classes</h2>
+<ul class="classList">
+	
+	<li><i><a href="../symbols/_global_.html">_global_</a></i></li>
+	
+	<li><a href="../symbols/Array.html">Array</a></li>
+	
+	<li><a href="../symbols/Loader.html">Loader</a></li>
+	
+	<li><a href="../symbols/Location.html">Location</a></li>
+	
+	<li><a href="../symbols/String.html">String</a></li>
+	
+</ul>
+<hr />
+		<!-- end publish.classesIndex -->
+	</td>
+	
+	<td id="content" width='*'>
+<!-- ============================== class title ============================ -->
+		<h1 class="classTitle">
+			
+			Object Loader
+		</h1>
+
+<!-- ============================== class summary ========================== -->			
+		<p class="description">
+			
+		
+			
+			
+			
+				<br /><i>Defined in: </i> <a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a>.
+			
+		</p>
+
+
+<!-- ============================== constructor summary ==================== -->			
+
+	<div class='constructor '>
+		<h3 class='constructor'>
+			<span class='attributes'></span>
+			<span class='title'>
+				Loader
+				()				
+			</span>
+		</h3>
+		<div class="description">
+			
+			Loader for hope system.
+	Use the loader to load scripts, xml files, css files, etc.
+		</div>
+
+		
+
+		
+
+
+		
+
+		
+
+		
+		
+
+		
+
+	</div><!-- class='constructor' -->
+
+
+
+
+<!-- ============================== properties summary ===================== -->
+
+	
+	
+			<h4 class='fields'>Fields:</h4>
+			<table class='fields'>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							
+								<span class='memberOf'>Loader.</span>
+							<a href="../symbols/Loader.html#.Dependencies">Dependencies</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							<span class="static">static</span>
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Map of `thing` -> `things which are dependent on the Thing`.
+
+					
+
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							
+								<span class='memberOf'>Loader.</span>
+							<a href="../symbols/Loader.html#.ExtensionMap">ExtensionMap</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							<span class="static">static</span>
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Map of `extension` -> `loader for that extension`.
+
+					
+
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							
+								<span class='memberOf'>Loader.</span>
+							<a href="../symbols/Loader.html#.LOAD_ERROR">LOAD_ERROR</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							<span class="static">static</span>
+							<span class="constant">constant</span>
+						</span>
+					</td>
+					<td class='description'>
+						
+						Flag that there was an error loading something.
+
+					
+
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+							<div class='attribute'>
+								<span class='label'>See:</span>
+								
+							</div>
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							
+								<span class='memberOf'>Loader.</span>
+							<a href="../symbols/Loader.html#.LoadCallbacks">LoadCallbacks</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							<span class="static">static</span>
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Map of methods to execute for things that are awaiting load.
+
+					
+
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							
+								<span class='memberOf'>Loader.</span>
+							<a href="../symbols/Loader.html#.Loaded">Loaded</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							<span class="static">static</span>
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Map of URLs and Things that we've already loaded.
+
+					
+
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							
+								<span class='memberOf'>Loader.</span>
+							<a href="../symbols/Loader.html#.LOADED">LOADED</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							<span class="static">static</span>
+							<span class="constant">constant</span>
+						</span>
+					</td>
+					<td class='description'>
+						
+						Flag that something has loaded successfully.
+
+					
+
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+							<div class='attribute'>
+								<span class='label'>See:</span>
+								
+							</div>
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							
+								<span class='memberOf'>Loader.</span>
+							<a href="../symbols/Loader.html#.LOADING">LOADING</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							<span class="static">static</span>
+							<span class="constant">constant</span>
+						</span>
+					</td>
+					<td class='description'>
+						
+						Flag that something is currently loading.
+
+					
+
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+							<div class='attribute'>
+								<span class='label'>See:</span>
+								
+							</div>
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							
+								<span class='memberOf'>Loader.</span>
+							<a href="../symbols/Loader.html#.loadScript">loadScript</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							<span class="static">static</span>
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Load a single script file from a URL and execute callback when it finishes loading.
+
+					
+
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							
+								<span class='memberOf'>Loader.</span>
+							<a href="../symbols/Loader.html#.loadScripts">loadScripts</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							<span class="static">static</span>
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Load a set of script files from a list of URLs.
+
+					
+
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							
+								<span class='memberOf'>Loader.</span>
+							<a href="../symbols/Loader.html#.loadStylesheet">loadStylesheet</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							<span class="static">static</span>
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Load a single stylesheet file from a URL and execute callback when it finishes loading.
+
+					
+
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							
+								<span class='memberOf'>Loader.</span>
+							<a href="../symbols/Loader.html#.loadStylesheets">loadStylesheets</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							<span class="static">static</span>
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Load a set of stylesheet files from a list of URLs.
+
+					
+
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							
+								<span class='memberOf'>Loader.</span>
+							<a href="../symbols/Loader.html#.Paths">Paths</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							<span class="static">static</span>
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Map of `name` -> `path to that named thing`.
+
+					
+
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							
+								<span class='memberOf'>Loader.</span>
+							<a href="../symbols/Loader.html#.Things">Things</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							<span class="static">static</span>
+							
+						</span>
+					</td>
+					<td class='description'>
+						
+						Map of `thing` -> `files that are needed to load the Thing`.
+
+					
+
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+
+					</td>
+				</tr>
+		
+				<tr><td class='parameter'>
+						<span class='title'>
+							
+								<span class='memberOf'>Loader.</span>
+							<a href="../symbols/Loader.html#.UNLOADED">UNLOADED</a>
+						</span>
+						<span class='attributes'>
+							
+							
+							<span class="static">static</span>
+							<span class="constant">constant</span>
+						</span>
+					</td>
+					<td class='description'>
+						
+						Flag that something has not been loaded.
+
+					
+
+					
+
+						
+				
+						
+						
+				
+						<div class='attribute'>
+							<span class='label'>Defined in:</span>
+							<span class='link'><a href="../symbols/src/_www_hope_hope_Loader.js.html">Loader.js</a></span>
+						</div>
+
+						
+							<div class='attribute'>
+								<span class='label'>See:</span>
+								
+							</div>
+						
+
+					</td>
+				</tr>
+		
+		</table>
+	
+	
+	
+
+
+
+<!-- ============================== methods summary ======================== -->
+
+	
+	<h2>Methods</h2>
+	
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>absoluteUrl<span class='signature'>(url, base)</span>
+	
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Convert the url to an absolute url (using the base location if provided).
+		URL can have named paths in it, or can be a relative URL, or can be an absolute URL.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>url</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										
+										
+									</td>
+									<td class='paramDescription'>Url to convert to an absolute URL.</td>
+								</tr>
+						
+								<tr><td class='parameter'>base</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										<span class='optional'>Optional</span>
+										
+									</td>
+									<td class='paramDescription'>Base path to use if `url` is not already an absolute url.
+				Defaults to `{document}`.</td>
+								</tr>
+						
+					
+
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>absoluteUrls<span class='signature'>(urls, base)</span>
+	
+						
+							
+								
+									<span class='returns'><a href="../symbols/String.html">String</a>[]</span>
+								
+							
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Convert a list of URLs to absolute urls.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+							<div class='attribute'>
+								<span class='label'>See:</span>
+								
+							</div>
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>urls</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a>[]</span>
+										
+										
+									</td>
+									<td class='paramDescription'>List of URLs to convert.</td>
+								</tr>
+						
+								<tr><td class='parameter'>base</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										<span class='optional'>Optional</span>
+										
+									</td>
+									<td class='paramDescription'>Base URL.</td>
+								</tr>
+						
+					
+
+					
+						
+								<tr><td class='parameter'>Returns:</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a>[]</span>
+									</td>
+									<td class='paramDescription'>Returns list of absolute URLs.</td>
+								</tr>
+						
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>expandNamedPath<span class='signature'>(url)</span>
+	
+						
+							
+								
+									<span class='returns'><a href="../symbols/String.html">String</a></span>
+								
+							
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Given named paths {eg: `{library}` in an URL to a normal path.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>url</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										
+										
+									</td>
+									<td class='paramDescription'>URL which possibly has a named path in it.</td>
+								</tr>
+						
+					
+
+					
+						
+								<tr><td class='parameter'>Returns:</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+									</td>
+									<td class='paramDescription'>URL with named path expanded.</td>
+								</tr>
+						
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>getCookie<span class='signature'>(key)</span>
+	
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Get a cookie value for a particular key.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>key</td>
+									<td class='paramAttributes'>
+										
+										
+										
+									</td>
+									<td class='paramDescription'></td>
+								</tr>
+						
+					
+
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>getDependencies<span class='signature'>(Name)</span>
+	
+						
+							
+								
+									<span class='returns'><a href="../symbols/String.html">String</a>[]</span>
+								
+							
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Return the list of files that `things` depend on.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>Name</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a> or String[]</span>
+										
+										
+									</td>
+									<td class='paramDescription'>or list of names of things to check.</td>
+								</tr>
+						
+					
+
+					
+						
+								<tr><td class='parameter'>Returns:</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a>[]</span>
+									</td>
+									<td class='paramDescription'>Absolute URLs of all files necessary to load things.</td>
+								</tr>
+						
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>getLastScript<span class='signature'>()</span>
+	
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Return the last script in the document.
+		This should be the currently running script (at least during load).</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>initialize<span class='signature'>()</span>
+	
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Initialize the loader.
+		Called automatically at end of Loader.js.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>insertScript<span class='signature'>(js, attributes)</span>
+	
+						
+							
+								
+									<span class='returns'>Element</span>
+								
+							
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Insert a bunch of JS as a &lt;script&gt; tag, which executes it immediately.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>js</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										
+										
+									</td>
+									<td class='paramDescription'>Javascript code to execute.</td>
+								</tr>
+						
+								<tr><td class='parameter'>attributes</td>
+									<td class='paramAttributes'>
+										<span class="type">Object</span>
+										<span class='optional'>Optional</span>
+										
+									</td>
+									<td class='paramDescription'>Object of attributes to assign to the new script element.</td>
+								</tr>
+						
+					
+
+					
+						
+								<tr><td class='parameter'>Returns:</td>
+									<td class='paramAttributes'>
+										<span class="type">Element</span>
+									</td>
+									<td class='paramDescription'>Returns pointer to the new script element.</td>
+								</tr>
+						
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>isLoaded<span class='signature'>(it)</span>
+	
+						
+							
+								
+									<span class='returns'>Boolean</span>
+								
+							
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Return true if `it` has already been loaded or is currently loading.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>it</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a> or String[]</span>
+										
+										
+									</td>
+									<td class='paramDescription'><li>String: Name or URL to check.</li>
+			<li>String[]: List of name or URLs to check.</li></td>
+								</tr>
+						
+					
+
+					
+						
+								<tr><td class='parameter'>Returns:</td>
+									<td class='paramAttributes'>
+										<span class="type">Boolean</span>
+									</td>
+									<td class='paramDescription'>`true` if all items are loaded.</td>
+								</tr>
+						
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>load<span class='signature'>(things, callback, errback)</span>
+	
+						
+					</td>
+				</tr>
+				<tr><td class='description'></td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>things</td>
+									<td class='paramAttributes'>
+										
+										
+										
+									</td>
+									<td class='paramDescription'></td>
+								</tr>
+						
+								<tr><td class='parameter'>callback</td>
+									<td class='paramAttributes'>
+										
+										
+										
+									</td>
+									<td class='paramDescription'></td>
+								</tr>
+						
+								<tr><td class='parameter'>errback</td>
+									<td class='paramAttributes'>
+										
+										
+										
+									</td>
+									<td class='paramDescription'></td>
+								</tr>
+						
+					
+
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>loadFiles<span class='signature'>(urls, callback, errback, skipUnknownExtensions)</span>
+	
+						
+							
+								
+									<span class='returns'>Boolean</span>
+								
+							
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Load a bunch of files ONLY ONCE according to their extension.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>urls</td>
+									<td class='paramAttributes'>
+										
+										
+										
+									</td>
+									<td class='paramDescription'></td>
+								</tr>
+						
+								<tr><td class='parameter'>callback</td>
+									<td class='paramAttributes'>
+										
+										
+										
+									</td>
+									<td class='paramDescription'></td>
+								</tr>
+						
+								<tr><td class='parameter'>errback</td>
+									<td class='paramAttributes'>
+										
+										
+										
+									</td>
+									<td class='paramDescription'></td>
+								</tr>
+						
+								<tr><td class='parameter'>skipUnknownExtensions</td>
+									<td class='paramAttributes'>
+										
+										
+										
+									</td>
+									<td class='paramDescription'></td>
+								</tr>
+						
+					
+
+					
+						
+								<tr><td class='parameter'>Returns:</td>
+									<td class='paramAttributes'>
+										<span class="type">Boolean</span>
+									</td>
+									<td class='paramDescription'>`true` if everything was already loaded or has been loaded synchronously, or
+						<br/>`false` if at least one thing could not be loaded synchronously</td>
+								</tr>
+						
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>loadHopePackage<span class='signature'>()</span>
+	
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Load the <i>hope</i> package, base functionality for everything in the hope system,
+		Called automatically at end of Loader.initialize().</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>loadLibrary<span class='signature'>(libraryName, callback)</span>
+	
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Load a library package.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>libraryName</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										
+										
+									</td>
+									<td class='paramDescription'>Name of the library to load.</td>
+								</tr>
+						
+								<tr><td class='parameter'>callback</td>
+									<td class='paramAttributes'>
+										<span class="type">Function</span>
+										<span class='optional'>Optional</span>
+										
+									</td>
+									<td class='paramDescription'>Callback to execute after load.</td>
+								</tr>
+						
+					
+
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>loadText<span class='signature'>(url, defer, callback, errback, errHint)</span>
+	
+						
+							
+								
+									<span class='returns'><a href="../symbols/String.html">String</a></span>
+								
+							
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Load a URL as text.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>url</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										
+										
+									</td>
+									<td class='paramDescription'>Url to load.</td>
+								</tr>
+						
+								<tr><td class='parameter'>defer</td>
+									<td class='paramAttributes'>
+										<span class="type">Boolean</span>
+										<span class='optional'>Optional</span>
+										
+									</td>
+									<td class='paramDescription'>(default: true) If true, we will defer the load (eg: asynchronous).</td>
+								</tr>
+						
+								<tr><td class='parameter'>callback</td>
+									<td class='paramAttributes'>
+										<span class="type">Function</span>
+										<span class='optional'>Optional</span>
+										
+									</td>
+									<td class='paramDescription'>Method to execute upon successful load.</td>
+								</tr>
+						
+								<tr><td class='parameter'>errback</td>
+									<td class='paramAttributes'>
+										<span class="type">Function</span>
+										<span class='optional'>Optional</span>
+										
+									</td>
+									<td class='paramDescription'>Method to execute if load fails.</td>
+								</tr>
+						
+								<tr><td class='parameter'>errHint</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										<span class='optional'>Optional</span>
+										
+									</td>
+									<td class='paramDescription'>Hint to pass to the errback function 
+			(eg: what you were doing that caused the load).</td>
+								</tr>
+						
+					
+
+					
+						
+								<tr><td class='parameter'>Returns:</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+									</td>
+									<td class='paramDescription'>If `defer == true`, returns contents of file as text.
+						  If `defer == false`, returns null.</td>
+								</tr>
+						
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>loadXML<span class='signature'>(url, defer, callback, errback, errHint)</span>
+	
+						
+							
+								
+									<span class='returns'><a href="../symbols/String.html">String</a></span>
+								
+							
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Load a URL and return the result as an XML document.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>url</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										
+										
+									</td>
+									<td class='paramDescription'>Url to load.</td>
+								</tr>
+						
+								<tr><td class='parameter'>defer</td>
+									<td class='paramAttributes'>
+										<span class="type">Boolean</span>
+										<span class='optional'>Optional</span>
+										
+									</td>
+									<td class='paramDescription'>(default: true) If true, we will defer the load (eg: asynchronous).</td>
+								</tr>
+						
+								<tr><td class='parameter'>callback</td>
+									<td class='paramAttributes'>
+										<span class="type">Function</span>
+										<span class='optional'>Optional</span>
+										
+									</td>
+									<td class='paramDescription'>Method to execute upon successful load.</td>
+								</tr>
+						
+								<tr><td class='parameter'>errback</td>
+									<td class='paramAttributes'>
+										<span class="type">Function</span>
+										<span class='optional'>Optional</span>
+										
+									</td>
+									<td class='paramDescription'>Method to execute if load fails.</td>
+								</tr>
+						
+								<tr><td class='parameter'>errHint</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										<span class='optional'>Optional</span>
+										
+									</td>
+									<td class='paramDescription'>Hint to pass to the errback function 
+			(eg: what you were doing that caused the load).</td>
+								</tr>
+						
+					
+
+					
+						
+								<tr><td class='parameter'>Returns:</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+									</td>
+									<td class='paramDescription'>If `defer == true`, returns contents of file as an xml document.
+						  If `defer == false`, returns null.</td>
+								</tr>
+						
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>makeLoadable<span class='signature'>(info)</span>
+	
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Set up a new loadable thing.
+		<pre>
+		NOTE: assumes the loadMethod:
+				- throws an exception if it couldn't load the file
+				- does NOT do any checking to see if that file is already loaded
+				- takes the following arguments:
+	
+					function loadSomething(url, defer, callback, errback)
+			where
+						url = any valid url
+						defer = true means we don't block waiting for this to finish
+							- note that 'defer' may have penalties (such as making debugging harder)
+							- note that each item loader can have its default defer()
+						callback to execute when loaded, as:  callback(result, url)
+						errback to execute on exception, as:  errback(error, url)
+							- if errback (re)throws an error, that stops subsequent loading
+							- if errback swallows the error, subsequent loading continues
+			and returns
+						if deferring, Loader.LOADING
+						if not deferring, actual file contents from the load
+		</pre></td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>info</td>
+									<td class='paramAttributes'>
+										
+										
+										
+									</td>
+									<td class='paramDescription'></td>
+								</tr>
+						
+					
+
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>markPageElementsAsLoaded<span class='signature'>()</span>
+	
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Mark all script elements as in the page as loaded</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>normalizeUrl<span class='signature'>(url)</span>
+	
+						
+							
+								
+									<span class='returns'><a href="../symbols/String.html">String</a></span>
+								
+							
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Convert a special characters in URL paths.
+		Converts `.`, `..`, and `//`.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>url</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										
+										
+									</td>
+									<td class='paramDescription'>URL to convert.</td>
+								</tr>
+						
+					
+
+					
+						
+								<tr><td class='parameter'>Returns:</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+									</td>
+									<td class='paramDescription'>URL with special characters converted.</td>
+								</tr>
+						
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>onload<span class='signature'>(it, loadResult)</span>
+	
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Execute the on load callback(s) for something and mark it as loaded.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>it</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										
+										
+									</td>
+									<td class='paramDescription'>A URL or a conceptual name like "document" or "package:hope".</td>
+								</tr>
+						
+								<tr><td class='parameter'>loadResult</td>
+									<td class='paramAttributes'>
+										
+										<span class='optional'>Optional</span>
+										
+									</td>
+									<td class='paramDescription'>The thing that was instantiated from this load 
+			(eg: the Package instance).</td>
+								</tr>
+						
+					
+
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>pathTo<span class='signature'>(thing)</span>
+	
+						
+							
+								
+									<span class='returns'><a href="../symbols/String.html">String</a></span>
+								
+							
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Return the path to some Thing</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>thing</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										
+										
+									</td>
+									<td class='paramDescription'>Name of the thing whose path you want.</td>
+								</tr>
+						
+					
+
+					
+						
+								<tr><td class='parameter'>Returns:</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+									</td>
+									<td class='paramDescription'>String path or `undefined`.</td>
+								</tr>
+						
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>setLoadResult<span class='signature'>(it, flag)</span>
+	
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Mark a url (or class name or) as loaded.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>it</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a> or String[]</span>
+										
+										
+									</td>
+									<td class='paramDescription'><li>String: Name or URL of thing to mark as loaded.</li>
+			<li>String[]: List of names or URLs of things to mark as loaded.</li></td>
+								</tr>
+						
+								<tr><td class='parameter'>flag</td>
+									<td class='paramAttributes'>
+										
+										
+										
+									</td>
+									<td class='paramDescription'>Value for loading flag.  Defaults to `Loader.LOADED`.</td>
+								</tr>
+						
+					
+
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>unloadedFiles<span class='signature'>(urls, base)</span>
+	
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Given a list of urls (and maybe a base path)
+		return the absolute urls of any items which have not been loaded.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>urls</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a>[]</span>
+										
+										
+									</td>
+									<td class='paramDescription'>List of urls to check.</td>
+								</tr>
+						
+								<tr><td class='parameter'>base</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										<span class='optional'>Optional</span>
+										
+									</td>
+									<td class='paramDescription'>Base path for all non-absolute urls.</td>
+								</tr>
+						
+					
+
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+			<table class='method'>
+				<tr><td class='title' colspan='2'>
+						
+							<span class='memberOf'>Loader.</span>whenLoaded<span class='signature'>(it, Function)</span>
+	
+						
+					</td>
+				</tr>
+				<tr><td class='description'>Add a method to be called when something finishes loading.</td>
+					<td class='attributes' rowspan='2'>
+						
+						
+						<span class="static">static</span>
+						
+						
+						
+						
+						
+					</td><!-- class='description' -->
+				</tr>
+
+			
+				<tr>
+					<td>
+						<table class='parameters'>
+					
+						
+								<tr><td class='parameter'>it</td>
+									<td class='paramAttributes'>
+										<span class="type"><a href="../symbols/String.html">String</a></span>
+										
+										
+									</td>
+									<td class='paramDescription'>A URL or a conceptual name like "document" or "package:hope".</td>
+								</tr>
+						
+								<tr><td class='parameter'>Function</td>
+									<td class='paramAttributes'>
+										<span class="type">Function</span>
+										
+										
+									</td>
+									<td class='paramDescription'>or string to eval when it is loaded.</td>
+								</tr>
+						
+					
+
+					
+
+					
+
+						</table>
+					</td>
+				</tr>
+			
+
+			
+
+			</table>
+		
+	
+	
+
+
+		
+<!-- ============================== events summary ======================== -->
+		
+
+
+
+<!-- ============================== event details ========================= -->		
+		
+		
+	</td><!-- id='content' -->
+</tr></table>
+
+
+	
+<!-- ============================== footer ================================= -->
+	<!-- begin footer.html -->
+<div class="fineprint" style="clear:both">
+	
+	Generated on Wed Nov 25 2009 18:03:57 GMT-0500 (EST) by <a href='http://code.google.com/p/jsdoc-toolkit/'>JsDoc Toolkit</a>
+</div>
+<!-- end footer.html -->
+
+</body>
+</html>

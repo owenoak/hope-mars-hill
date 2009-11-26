@@ -1,9 +1,34 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:hope="http://hope">
 <head>
 	<title>Event tests</title>
-	<script src='/hope/Loader.js' packages='{library}control, {library}Inspector'>
+	<script src='/hope/Loader.js' packages='{library}Inspector'>
 		console.warn("loader script executed");
 		//Inspector.inspect();
+		
+		window.it = new Viewable({
+			id : "foo",
+			parentElement : "body",
+			mainTemplate : new Template({name:"foo"}, "<div <<@events>> >I am from the template</div>"),
+			observes : "mousedown",
+			onmousedown : function() {
+				console.warn("mouse is down in foo");
+			},
+			
+			children : [
+				new Viewable({
+					id : "kid1",
+					mainTemplate : new Template("<div<<@id>>>I am kid 1</div>")
+				}),
+
+				new Viewable({
+					id : "kid2",
+					mainTemplate : new Template("<div <<@id>>>I am kid 2's first element</div>"
+													+ "<li>I am kid 2's second element</li>")
+				})
+			]
+		});
+		console.warn("created:",it);
+		it.draw();
 	</script>
 
 	<style>
@@ -17,27 +42,27 @@
 <body>
 
 <section id='container'>
-	<div class='tester' id='mouse' observes='mousedown mouseup click dblclick'>
+	<div class='tester' id='mouse' observes='mousedown|mouseup|click|dblclick'>
 		Normal mouse down/up/click events
 		<span class='inside'>Inside element</span>
 	</div>
 
-	<div class='tester' id='stilldown' observes='mousedown mousestilldown mouseup'>
+	<div class='tester' id='stilldown' observes='mousedown|mousestilldown|mouseup'>
 		Mousestilldown
 		<span class='inside'>Inside element</span>
 	</div>
 
-	<div class='tester' id='over' observes='mouseover mouseenter mouseleave mouseout'>
+	<div class='tester' id='over' observes='mouseover|mouseenter|mouseleave|mouseout'>
 		Mouse over/out + mouseenter/leave
 		<span class='inside'>Inside element</span>
 	</div>
 
-	<div class='tester' id='hover' observes='hoverstart hover hoverstop'>
+	<div class='tester' id='hover' observes='hoverstart|hover|hoverstop'>
 		Hover events
 		<span class='inside'>Inside element</span>
 	</div>
 
-	<div class='tester' id='drag' observes='dragstart drag dragstop'>
+	<div class='tester' id='drag' observes='dragstart|drag|dragstop'>
 		Drag events
 		<span class='inside'>Inside element</span>
 	</div>

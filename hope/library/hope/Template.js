@@ -11,9 +11,13 @@ new Class({
 		args : "it",			// name of the argument(s) in the expander function
 
 		initialize : function(props, text) {
-			this.set(props);
+			if (arguments.length == 1 && typeof arguments[0] == "string") {
+				this.text = arguments[0];
+			} else {
+				this.set(props);
+				if (text) this.text = text;
+			}
 			this.makeGloballyAddressable();
-			if (text) this.text = text;
 		},
 
 		// the first time the Template is expanded
@@ -29,7 +33,7 @@ new Class({
 			var args = this.args,
 				firstArg = args.split(/\s*,\s*/)[0],
 				indent = "",
-				chopped = this.text.chop(/(<<|<#>)/g, /(<\/#>|>>)/g),
+				chopped = this.text.chop(/(<<@?|<#>)/g, /(<\/#>|>>)/g),
 				script = [];
 			;
 
@@ -49,11 +53,19 @@ new Class({
 
 				else {
 					// output attributes if they are not empty
-					if (next.start[0] == "@{") {
+					if (next.start[0] == "<<@") {
+						script.push("try { ");
+						
+						if (next.middle == "events") {
+							script.push("output += arguments[0].getEventAttributes();");
+						} else {
+							script.push("__value = arguments[0]."+next.middle+";"
+									+ "if (__value != null && value != '') {"
+										+" output += ' "+next.middle+"=\"' + __value + '\"';"
+									+ "}");
+						}
 						script.push(
-							"try { __value = ("+next.middle+") } catch(e){ __value = null;};"
-							+"if (__value != null && __value != '')"
-								+" output += "+next.middle+"=\"' + __value + '\"';"
+							"} catch(e){ __value = null;};"
 						);
 
 					// handle  #{...}
@@ -94,6 +106,12 @@ new Class({
 	},
 
 	classDefaults : {
+		get : function(template) {
+			if (template instanceof Template) return template;
+			return Templates[template];
+		},
+		
+		
 		// 	Load one or more templates from a URL.
 		//	Use Loader.loadTemplate() and Loader.loadTemplates() instead of this
 		//		unless you know what you're doing.
@@ -133,7 +151,7 @@ new Class({
 
 		// expand the specified template with arguments 1..n
 		expand : function(templateId) {
-			var template = Templates[templateId];
+			var template = Template.get(templateId);
 			if (!template) {
 				Template._debug(".expand(",templateId,"): template not found");
 				return "";

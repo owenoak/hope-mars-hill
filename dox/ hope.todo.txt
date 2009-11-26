@@ -139,6 +139,10 @@
 ::: Loader :::
 ::::::::::::::
 
+- getCookie -- we can skip this if we load Cookie.js before Debuggable
+- error if script in manifest is not present:
+	- FF:  uncaught exception: Error loading script
+	- something to do with errback not quite working right
 
 - test:
 	- loadX():
@@ -271,8 +275,22 @@
 ::: Control :::
 :::::::::::::::
 
-- offset/left/etc routines -- just call on main?  make functions so we can do the selector thing?
-- check return values for all invoke() thingers
+- select() and selectAll() do NOT match the primary elements -- should they?
+
+- selectableText 
+	-- css class for canceling select?
+	-- children?  do with a global event handler?
+
+- loading data semantics built-in?  mixin?
+	- if beforeDraw throws a special exception, defer the rest?
+
+- focus
+	- including child focused
+
+- select/selectAll -- interferes with selection semantics
+	- change to "match" ?
+	- 'invoke' name is not so hot, either
+
 - value semantics?
 
 - enumerateAncestors(method) & enumerateDescendants(method)

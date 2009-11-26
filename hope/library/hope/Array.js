@@ -52,7 +52,7 @@ extend(Array, {
 	combine : function combine() {
 		var output = [];
 		for (var i = 0, len = arguments.length; i < len; i++) {
-			if (arguments[i]) Array.toArray(arguments[i], output);
+			if (arguments[i] && arguments[i].length) Array.toArray(arguments[i], output);
 		}
 		return output;
 	},

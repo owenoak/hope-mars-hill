@@ -37,19 +37,23 @@ var elementMethods = {
 	get elements() {
 		return (new ElementList()).setTo(this.children);
 	},
+	
+	
+	//
+	//	html manipulation
+	//
 
 	// getter/setter for inner html of element
 	// use html = foo especially because:
 	//		1) it will make sure any children are cleaned up
 	//		2) it will hook up events for children (?)
-	get html() {
+	html : function(html) {
+		if (html != null) {
+			this.destroyChildren();
+			this.innerHTML = html;
+			this.hookupChildEvents();
+		}
 		return this.innerHTML;
-	},
-
-	set html(html) {
-		this.destroyChildren();
-		this.innerHTML = html;
-		this.hookupChildEvents();
 	},
 
 
@@ -72,36 +76,57 @@ var elementMethods = {
 		return this;
 	},
 
+	// add a list of children to us
+	addList : function(list, index) {
+		if (!list || !list.length) return;
+		if (index == null) index = this.elements.length;
+		Array.forEach(list, function(element) {
+			this.add(element, index++);
+		}, this);
+		return this;
+	},
+	
+	// add this element as a child of parent
+	addTo : function(parent, index) {
+		parent.add(child, index);
+		return this;
+	},
+
 	// add the element to the end of my list of elements
 	// goes through 'add' for consistency
 	append : function append(element) {
-		return this.add(element);
+		this.add(element);
+		return this;
 	},
 
 	// add one or more elements to front of my list of elements
 	//	goes through 'add' for consistency
 	prepend : function prepend(element) {
-		return this.add(element, 0);
+		this.add(element, 0);
+		return this;
 	},
 
 	// append this element to someone else
 	appendTo : function appendTo(parent) {
 		parent.append(this);
+		return this;
 	},
 
 	// prepend this element to someone else
 	prependTo : function prependTo(parent) {
 		parent.prepend(this);
+		return this;
 	},
 
 	// remove everything from this element
 	empty : function empty() {
-		this.html = "";
+		this.html("");
 	},
 
 	// remove an element from us
 	remove : function remove(element) {
-		return this.removeChild(element);
+		this.removeChild(element);
+		return this;
 	},
 
 	// remove us from our parent node
@@ -114,6 +139,21 @@ var elementMethods = {
 	//	NOTE: the syntax is opposite of replaceChild
 	replace : function replace(oldElement, newElement) {
 		this.replaceChild(newElement, oldElement);
+		return this;
+	},
+	
+	// remove old elements and put newElements in at more-or-less the same place
+	replaceList : function(oldElements, newElements) {
+		var index = (oldElements && oldElements.length > 0 ? this.indexOf(oldElements[0]) : -1);
+		if (index == -1) index = this.children.length;
+		
+		if (oldElements) {
+			oldElements.forEach(function(element) { 
+					this.remove(oldElement)
+				}, this);
+		}
+		if (newElements) this.addList(newElements, index);
+		return this;
 	},
 
 	// clone this node and all children
@@ -336,7 +376,7 @@ var elementMethods = {
 
 	// return the current style for prop (in camelCase form)
 	// todo: prop as an array?  props as a commaized string?
-	get : function(prop) {
+	getStyle : function(prop) {
 		var style = this.computedStyle;
 		if (arguments.length == 1 && typeof prop == "string") {
 			return style[prop];
@@ -352,7 +392,7 @@ var elementMethods = {
 	// set a bunch of styles either as:
 	//		string of  "camelCaseProp:blah;otherProp:blah;"
 	//  or  object of  {camelCaseProp:'blah', otherProp:'blah'}
-	set : function(styles) {
+	setStyle : function(styles) {
 		if (typeof styles == "string") {
 			styles = styles.split(/\s*;\s*/);
 			styles.forEach(function(style) {
@@ -434,7 +474,7 @@ var elementMethods = {
 
 	// return true if this element is position is one of 'absolute', 'relative' or 'fixed'
 	isPositioned : function() {
-		var position = this.get('position');
+		var position = this.getStyle('position');
 		return (position == 'absolute' || position == 'relative' || position == 'fixed');
 	},
 
@@ -444,12 +484,12 @@ var elementMethods = {
 	//	If <toPage> is true,  element is re-rooted to <body> element.
 	absolutize : function (toPage) {
 		if (toPage) {
-			if (this.get('position') == "absolute" && this.parentNode == document.body) return this;
+			if (this.getStyle('position') == "absolute" && this.parentNode == document.body) return this;
 			var rect = this.rect;
 			document.body.add(this);
 
 		} else {
-			if (this.get('position') == "absolute") return this;
+			if (this.getStyle('position') == "absolute") return this;
 			var rect = this.offsetRect;
 		}
 
@@ -464,113 +504,111 @@ var elementMethods = {
 
 
 	// first parent with relative/absolute positioning
-	get offsetParent() {
+	offsetParent : function() {
 		return this.selectParent(this.isPositioned);
 	},
 	
 	// all ancestors with relative/absolute positioning
-	get offsetParents() {
+	offsetParents : function() {
 		return this.ancestors(this.isPositioned);
 	},
 
-	get offsetRect() {
-		return new Rect(this.offsetLeft, this.offsetTop, this.width, this.height);
+	offsetRect : function() {
+		return new Rect(this.offsetLeft, this.offsetTop, this.width(), this.height());
 	},
 
 	// return an object with {left, top, right, bottom, width, height} relative to the page
-	get rect() {
-		return new Rect(this.left, this.top, this.width, this.height);
+	rect : function() {
+		return new Rect(this.pageLeft(), this.pageTop(), this.width(), this.height());
 	},
 
 
-	// return the left of this element relative to the entire page
-	get left() {
+	// get/set the left of this element relative to the offset parent
+	left : function(left) {
+		if (left != null) {
+			if (typeof left == "number") left += "px";
+			this.style.left = left;
+		}
+
+		return this.offsetLeft;		
+	},
+	
+	// get the left of this element relative to the entire page
+	pageLeft : function() {
 		var left = this.offsetLeft;
-		this.offsetParents.forEach(function(parent) {
+		this.offsetParents().forEach(function(parent) {
 			left += parent.offsetLeft;
 		});
 		return left;
 	},
 
+	// get/set the top of this element relative to the offset parent
+	top : function(top) {
+		if (top != null) {
+			if (typeof top == "number") top += "px";
+			this.style.top = top;
+		}
+		return this.offsetTop;
+	},
+
 	// return the top of this element relative to the entire page
-	get top() {
+	pageTop : function() {
 		var top = this.offsetTop;
-		this.offsetParents.forEach(function(parent) {
+		this.offsetParents().forEach(function(parent) {
 			top += parent.offsetTop;
 		});
 		return top;
 	},
 
-	// set left/top (relative to offsetParent) -- mainly here so you don't have to add "px" to a number
-	set left(left) {
-		if (typeof left == "number") left += "px";
-		this.style.left = left;
-	},
-	set top(top) {
-		if (typeof top == "number") top += "px";
-		this.style.top = top;
-	},
-
-
 	//
 	// get/set outside width/height of the element (including border+padding, not including margin)
 	//
-	get width() {
+	width : function(width) {
+		if (width != null) {
+			if (typeof width == "number") width += "px";
+			this.style.width = width;
+		}
 		return this.offsetWidth;
 	},
-	set width(width) {
-		if (typeof width == "number") width += "px";
-		this.style.width = width;
-	},
 
-	get height() {
+	height : function(height) {
+		if (height != null) {
+			if (typeof height == "number") height += "px";
+			this.style.height = height;
+		}
 		return this.offsetHeight;
-	},
-	set height(height) {
-		if (typeof height == "number") height += "px";
-		this.style.height = height;
 	},
 
 	//
 	// get/set content width/height -- does NOT include border, padding or margins
 	//
-	get innerWidth() {
-		var width = this.width,
-			padding = this.padding,
-			borders = this.borders
-		;
-		return width - (padding.left + padding.right + borders.left + borders.right);
-	},
-	set innerWidth(width) {
-		var padding = this.padding,
-			borders = this.borders
-		;
-		width += (padding.left + padding.right + borders.left + borders.right);
-		this.style.width = width + "px";
-		return width;
+	innerWidth : function(width) {
+		var padding = this.padding(), borders = this.borders();
+		
+		if (width != null) {
+			width += (padding.left + padding.right + borders.left + borders.right);
+			this.style.width = width + "px";
+		}
+		
+		return this.offsetWidth - (padding.left + padding.right + borders.left + borders.right);
 	},
 
-	get innerHeight() {
-		var height = this.height,
-			padding = this.padding,
-			borders = this.borders
-		;
-		return height - (padding.top + padding.bottom + borders.top + borders.bottom);
-	},
-	set innerHeight(height) {
-		var height = this.height,
-			padding = this.padding,
-			borders = this.borders
-		;
-		height += (padding.top + padding.bottom + borders.top + borders.bottom);
-		this.style.height = height + "px";
-		return height;
+	innerHeight : function(height) {
+		var padding = this.padding(), borders = this.borders();
+
+		if (height != null) {
+			height += (padding.top + padding.bottom + borders.top + borders.bottom);
+			this.style.height = height + "px";
+			return height;
+		} 
+
+		return this.offsetHeight - (padding.top + padding.bottom + borders.top + borders.bottom);
 	},
 
 
 
 	// return the padding for this element as {left, top, right, bottom}
-	get padding() {
+	padding : function() {
 		var style = this.computedStyle;
 		return {
 			left : parseFloat(style.paddingLeft),
@@ -581,7 +619,7 @@ var elementMethods = {
 	},
 
 	// return the borders for this element as {left, top, right, bottom}
-	get borders() {
+	borders : function() {
 		var style = this.computedStyle;
 		return {
 			left : parseFloat(style.borderLeftWidth),
@@ -592,7 +630,7 @@ var elementMethods = {
 	},
 
 	// return the margins for this element as {left, top, right, bottom}
-	get margins() {
+	margins : function() {
 		var style = this.computedStyle;
 		return {
 			left : parseFloat(style.marginLeft),
@@ -605,25 +643,25 @@ var elementMethods = {
 	// resize to a specific (outer) width and height
 	//	TODO: animation?
 	resize : function resize(width, height) {
-		if (width != undefined) this.width = width;
-		if (height != undefined) this.height = height;
+		if (width != null) this.width(width);
+		if (height != null) this.height(height);
 		return this;
 	},
 
 	// TODO: animation
 	moveTo : function(left, top) {
-		if (left != undefined) this.left = left;
-		if (top != undefined) this.top = top;
+		if (left != null) this.left(left);
+		if (top != null) this.top(top);
 		return this;
 	},
 
 	// TODO: animation
 	//	TODO: may want to set right & bottom if current width is a percentage...
 	setRect : function(rect) {
-		this.left = rect.left;
-		this.top = rect.top;
-		this.width = rect.width;
-		this.height = rect.height;
+		this.left(rect.left);
+		this.top(rect.top);
+		this.width(rect.width);
+		this.height(rect.height);
 	},
 
 
@@ -633,7 +671,7 @@ var elementMethods = {
 
 	// TODO: take a speed parameter?
 	scrollTo : function(left, top) {
-		if (arguments.length == 1 && left.left != undefined || left.top != undefined) {
+		if (arguments.length == 1 && left.left != null || left.top != null) {
 			top = arguments[0].top;
 			left = arguments[0].left;
 		}
@@ -732,7 +770,7 @@ var elementMethods = {
 			;
 			element = this.create(enclosingTag, enclosedHTML).select(tagName);
 		} else {
-			if (html) element.html = html;
+			if (html) element.html(html);
 			if (text) element.add(document.createTextNode(text));
 		}
 

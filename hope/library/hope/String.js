@@ -56,7 +56,7 @@ extend(String.prototype, {
 	},
 
 	toElements : function() {
-		return document.create("div", {html:this}).children;
+		return document.create("div", {html:this}).elements;
 	}
 });
 

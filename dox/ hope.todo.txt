@@ -275,6 +275,19 @@
 ::: Control :::
 :::::::::::::::
 
+- mixing all of the element methods onto control seems a bit wierd,
+	and will yield many semantic collisions (eg: 'select' and 'selectAll')
+	- pattern:
+		- every viewable automatically gets two objects:
+			- children: (Array or ViewList ?) sub-views  (specify a different name for children?)
+			- elements: (ElementList) list of elements we manage
+		+ then all of the element methods are just elements.select()... etc
+		+ we can then replicate some of the methods for children, children.select(type)
+		+ it would be SUPER cool if 'children' was an arbitrary property name
+			and everything else just worked -- that way menus can have 'items' etc
+		+ keeps the API footprint of the main View class down quite a bit
+		- have to create two arrays per view, but probably not a big deal if they are empty
+
 - select() and selectAll() do NOT match the primary elements -- should they?
 
 - selectableText 

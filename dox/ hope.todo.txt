@@ -54,14 +54,32 @@
 
 
 
-::::::::::::::::::::::::::
-::: Array / Iteratable :::
-::::::::::::::::::::::::::
+:::::::::::::::::::::::::::::::::
+::: Array / Iteratable / Tree :::
+:::::::::::::::::::::::::::::::::
 
-- verify that Array & ElementList have all methods
-- array methods which return a new array (splice, etc) should return a new item of the same type?
-- 'all' and 'some' as boolean aggregators for Array
-- put all array.prototype methods on Array
+- test suite for Array/Tree
+- change Heirarchical to "TreeLike"?
+	- have ability to supply separate name for "asTree"
+- implement Iterable methods on Array
+- forget the Array prototype thing
+- change ElementList to List subclass
+
+- think about data objects which update via XML/JSON
+	and corresponding view objects which want to redraw
+		- lends itself to observer paradigm
+		- needs some sort of controller to manage add/delete
+		? how to get a handle to an element if we haven't created it?
+
+- how to get children?
+	- setter combo?
+	- object.children = foo  should do a set
+- array methods with list() should exit if getList(this) == undefined		
+
+- figure out which array methods can be called on arguments, which cannot
+	- both in Safari and FF
+
+- put all array.prototype methods on Array?
 - iteratble methods could work on anything if:
 	- when adding/removing/etc, make sure .length is also updated
 
@@ -79,19 +97,15 @@
 		? 'Set' concept?
 
 
-::::::::::::::::::
-::: Collection :::
-::::::::::::::::::
-- the whole collection.get thing is annoying
-- make the collection a function, so you can say:
-			Templates(foo).blah.blah  ?
-	- the iteration is wierd with this pattern...
 
 
 :::::::::::::::
 ::: Classes :::
 :::::::::::::::
 
+- classes can have a "registry" [indexed by id()] or a "collection" [linear list]
+	- "IndexedCollection" vs. "Collection" ?
+	
 - we don't remember mixins, so we can't tell where some functions come from...
 - global id:
 	- when an instance of a 'collected' class is instantiated,
@@ -105,6 +119,16 @@
 
 - test class creation time
 - test instance instantiation time vs. simple class
+
+
+
+::::::::::::::::::
+::: Collection :::
+::::::::::::::::::
+- the whole collection.get thing is annoying
+- make the collection a function, so you can say:
+			Templates(foo).blah.blah  ?
+	- the iteration is wierd with this pattern...
 
 
 :::::::::::::::::

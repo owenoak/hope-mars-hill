@@ -156,7 +156,7 @@ new Class({
 				Template._debug(".expand(",templateId,"): template not found");
 				return "";
 			}
-			var args = Array.splice(arguments, 0, 1);
+			var args = Array.args(arguments, 1);
 			return template.expand.apply(template, args);
 		},
 

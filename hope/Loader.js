@@ -88,10 +88,10 @@ window.Loader = {
 		;
 
 		// path to the document
-		Loader.Paths.document = documentPath;
+		Loader.setPath("document", documentPath, false);
 
 		// NOTE: assumes that this document is at the top-level for its 'app'
-		Loader.Paths.app = documentPath;
+		Loader.setPath("app", documentPath, false);
 
 		// At this point the loader path will be the src of the last script in the document
 		// Figure out the base path relative to the URL of the loader file.
@@ -107,19 +107,19 @@ window.Loader = {
 		//
 
 		// base of peers of hope system
-		Loader.Paths.base = basePath;
+		Loader.setPath("base", basePath, false);
 
 		// cache directory (for pre-compiled scripts)
-		Loader.Paths.cache = basePath + "cache/";
+		Loader.setPath("cache", basePath + "cache/", false);
 
 		// test directory
-		Loader.Paths.test = basePath + "test/";
+		Loader.setPath("test", basePath + "test/", false);
 
 		// base of hope system
-		Loader.Paths.hope = loaderPath;
+		Loader.setPath("hope", loaderPath, false);
 
 		// library directory
-		Loader.Paths.library = loaderPath + "library/";
+		Loader.setPath("library", loaderPath + "library/", false);
 
 
 		// any inlined script in the Loader script element should be executed
@@ -631,12 +631,23 @@ window.Loader = {
 	},
 
 
+
 	/** Return the path to some Thing 
 		@param {String} thing Name of the thing whose path you want.
 		@returns {String} String path or `undefined`.
 	*/
 	pathTo : function(thing) {
 		return Loader.Paths[thing];
+	},
+
+
+	/** Set the path to some thing.
+		@param {String} thing Name of the thing whose path you want.
+		@returns {String} String path or `undefined`.
+	*/
+	setPath : function(thing, path, absolutize) {
+		if (absolutize != false) path = Loader.absoluteUrl(path);
+		return (Loader.Paths[thing] = path);
 	},
 
 

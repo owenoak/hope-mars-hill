@@ -1,0 +1,6 @@
+<package name='assert'>
+	<files>
+		<script url="Log.js" preload="true" />
+		<script url="Assert.js" preload="true" />
+	</files>
+</package>

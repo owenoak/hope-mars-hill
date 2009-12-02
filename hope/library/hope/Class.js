@@ -57,7 +57,6 @@
 		if (properties.mixin) {
 			properties.mixin.split(",").forEach(function(mixin) {
 				if (typeof mixin == "string") mixin = window[mixin];
-				var mixinName = mixin.name;
 				mixin.apply(constructor);
 			});
 		}
@@ -90,7 +89,7 @@
 		for (var key in Array) {
 			constructor[key] = Array[key];
 		}
-		Array.makeIteratable(constructor);
+		Array.makeIterable(constructor);
 		return constructor;
 	}
 
@@ -214,12 +213,13 @@
 		
 		notify : function(event) {
 			var observers = (this.observers ? this.observers[event] : null);
-			if (!observers) return;
-			var methodName = "on"+event;
-			arguments[0] = this;
-			observers.forEach(function(observer) {
-				if (observer[methodName]) observer[methodName].apply(observer, arguments);
-			});
+			if (observers) {
+				var methodName = "on"+event;
+				arguments[0] = this;
+				observers.forEach(function(observer) {
+					if (observer[methodName]) observer[methodName].apply(observer, arguments);
+				});
+			}
 		},
 		
 		
@@ -257,6 +257,8 @@
 	// Mixin constructor
 	// 	pass in properties object with:
 	//		name				(required) name of the mixin
+	//		defaults			(required) methods/properties to mix in to each constructor.prototype
+	//		classDefaults		(optional) methods/properties to mix in to each constructor
 	//		getDefaults() 		(optional) returns methods + properties to apply to the constructor.prototype
 	//		getClassDefaults()	(optional) returns methods + proeprties to apply to the constructor
 	//		initialize()		(optional) initialize the mixin itself (only called once)
@@ -275,8 +277,10 @@
 	//
 	window.Mixin = function Mixin(properties) {
 		this.extend(properties);
+		this.Super = this["super"] || this.Super;
 
-		// call the initializer for the mixin itself
+		// initialize the mixin
+		this.Mixers = [];
 		if (this.initialize) this.initialize();
 		window[this.name] = this;
 	}
@@ -284,8 +288,15 @@
 	Mixin.prototype = {
 		extend : extendThis,
 		apply : function apply(constructor) {
+			this.Mixers.push(constructor);
+			
+			if (this.Super) {
+				var Super = window[this.Super];
+				if (Super) Super.apply(constructor);
+			}
+			
 			// get the defaults (methods+properties) to apply to the constructor
-			var defaults = this.getDefaults(constructor);
+			var defaults = this.getDefaults.apply(this, arguments);
 			if (defaults) {
 				// actually add them to the constructor prototype
 				constructor.prototype.extend(defaults);
@@ -303,20 +314,28 @@
 				}
 			}
 
-			var classDefaults = this.getClassDefaults(constructor);
+			var classDefaults = this.getClassDefaults.apply(this, arguments);
 			if (classDefaults) {
 				constructor.extend(classDefaults);
 			}
 		},
 
-		getDefaults : function getDefaults(){},
-		getClassDefaults : function getClassDefaults() {},
+		getDefaults : function getDefaults(){
+			return this.defaults;
+		},
+		getClassDefaults : function getClassDefaults() {
+			return this.classDefaults;
+		},
 
 		getSuperCaller : function(constructor) {
 			return "as"+constructor.Super.ClassName;
 		},
 
-		asAMixin : _prototypeSelfCaller(Mixin)
+		asMixin : _prototypeSelfCaller(Mixin),
+		
+		toString : function() {
+			return "[Mixin "+this.name+"]";
+		}
 	}
 
 })();

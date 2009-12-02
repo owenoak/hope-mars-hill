@@ -16,10 +16,16 @@
 		<script url="Date-format.js" preload="true" />
 		<script url="Cookie.js" preload="true" />
 		<script url="Array.js" preload="true" />
-		<script url="Iteratable.js" preload="true" />
+		<script url="Array-Iterable.js" preload="true" />
 		<script url="ListMap.js" preload="true" />
 
 		<script url="Class.js" preload="true" />
+
+		<script url="Iterable.js" preload="true" />
+		<script url="List.js" preload="true" />
+		<script url="Heirarchical.js" preload="true" />
+		<script url="Tree.js" preload="true" />
+
 		<script url="Collection.js" preload="true" />
 		<script url="XMLClass.js" preload="true" />
 
@@ -43,7 +49,7 @@
 		<script url="JSON.js" preload="true" />
 		<script url="Template.js" preload="true" />
 
-		<script url="Viewable.js" preload="true" />
+		<script url="View.js" preload="true" />
 
 
 		<script url="Notifier.js" Xpreload="true" />

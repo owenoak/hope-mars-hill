@@ -3,7 +3,7 @@
 // ::
 //
 //	A collection is a set of things which is indexed by id 
-//	 AND can be iterated using normal Iteratable methods (forEach, etc).
+//	 AND can be iterated using normal Iterable methods (forEach, etc).
 //
 //	To access items in the collection by id:  	collection.get(id)
 //	To add something to the collection:			collection.add(it [,id])
@@ -63,5 +63,5 @@ new Class({
 });
 
 // add all Iterator methods to Collections
-Array.makeIteratable(Collection);
+Array.makeIterable(Collection);
 

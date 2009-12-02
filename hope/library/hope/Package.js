@@ -15,8 +15,10 @@ new Class({
 		initialize : function(properties) {
 			this.set(properties);
 			var packageName = "package:"+this.name;
+
 			// remember the path to this package
-			Loader.Paths[packageName] = this.path;
+			if (this.path) Loader.setPath(packageName, this.path);
+
 			// and call any onload handlers for the package
 			Loader.onload(packageName, this);
 		}
@@ -39,6 +41,7 @@ new Class({
 			if (!xml) xml = Loader.loadXML(url, false);
 			var props = Package.XMLManifestToJS(xml);
 			props.xml = xml;
+			props.path = Loader.absoluteUrl(url.toLocation().fullpath);
 
 			function makePackage() {
 				var pkg = new Package(props);

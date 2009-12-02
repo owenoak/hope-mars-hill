@@ -5,7 +5,7 @@
 		console.warn("loader script executed");
 		//Inspector.inspect();
 		
-		window.it = new Viewable({
+		window.it = new View({
 			id : "foo",
 			parentElement : "body",
 			mainTemplate : new Template({name:"foo"}, "<div <<@events>> >I am from the template</div>"),
@@ -15,12 +15,12 @@
 			},
 			
 			children : [
-				new Viewable({
+				new View({
 					id : "kid1",
 					mainTemplate : new Template("<div<<@id>>>I am kid 1</div>")
 				}),
 
-				new Viewable({
+				new View({
 					id : "kid2",
 					mainTemplate : new Template("<div <<@id>>>I am kid 2's first element</div>"
 													+ "<li>I am kid 2's second element</li>")

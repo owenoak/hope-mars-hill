@@ -1,7 +1,7 @@
 /* Array iterators:
 	- add array iterator methods to list-like things, eg: NodeList, NamedNodeMap, etc
 
-	TODO:		- makeIteratable() could (?) take a suffix to add to the methods
+	TODO:		- makeIterable() could (?) take a suffix to add to the methods
 					so we can do  "addChild" instead of "add" ???
 					- NOTE: this will require that installed methods DO NOT call other installed methods
 				- check to make sure we handle arrays with empty items properly
@@ -19,11 +19,11 @@
 extend(Array, {
 
 	// List of objects which should get the array-like methods
-	//	Stick Array.prototype in there so new methods get added to that
+	//	Stick Array in there so new methods get added to that
 	Iteratables : [Array],
 
-	// Make something which has a length property and item() method iteratable
-	makeIteratable : function makeIteratable() {
+	// Make something which has a length property and item() method iterable
+	makeIterable : function makeIterable() {
 		forEach(arguments, function(Class) {
 			Array.Iteratables.push(Class);
 			for (var name in Array.IteratorMethods) {
@@ -54,7 +54,7 @@ extend(Array, {
 	// List of Array.prototype iteration/etc methods to add to other array-like things
 	IteratorMethods : {
 
-		iteratable : true,			// flag that shows we can be iterated over
+		iterable : true,			// flag that shows we can be iterated over
 
 		extend : extendPrototype,
 		extendClass : extendThis,
@@ -101,8 +101,9 @@ extend(Array, {
 		},
 
 		// return only item()s for which method call returns a true-ish value
+		// TODO: rename "selectAll"
 		filter : function filter(method, context) {
-			var results = [];
+			var results = new this.constructor();
 			for (var index = 0, len = this.length; index < len; index++) {
 				var it = this[index];
 				if (method.call(context, it, index, this)) results.push(it);
@@ -180,7 +181,7 @@ extend(Array, {
 });
 
 
-Array.makeIteratable(Array);
+Array.makeIterable(Array);
 
 //
 //	additional methods available on all Iteratables
@@ -191,7 +192,7 @@ Array.addIterators({
 
 	// return a new array with each item in it only once
 	unique : function() {
-		var results = [];
+		var results = new this.constructor;
 		for (var index = 0, len = this.length; index < len; index++) {
 			var it = this[index];
 			if (!results.contains(it)) results[results.length] = it;
@@ -230,12 +231,13 @@ Array.addIterators({
 	},
 
 	// return true if it is found in this list
-	// if index is passed, starts at that index (same semantics as iteratable.indexOf)
+	// if index is passed, starts at that index (same semantics as iterable.indexOf)
 	contains : function contains(it, index) {
 		return this.indexOf(it, index) > -1;
 	},
 
 	// return first element which matches a particular criteria (eg: results of callback is not null, false, "" or undefined)
+	// TODO: rename "select"
 	first : function first(callback, context) {
 		for (var index = 0, len = this.length; index < len; index++) {
 			var it = this[index];
@@ -282,6 +284,6 @@ Array.addIterators({
 		for (var index = 0, len = this.length; index < len; index++) {
 			if (this[index] == oldItem) this[index] = newItem;
 		}
-		return false;
+		return this;
 	}
 });

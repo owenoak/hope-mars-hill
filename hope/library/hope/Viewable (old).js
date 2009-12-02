@@ -1,17 +1,17 @@
 /*
-	A Viewable is a JS object which has an on-screen representation, draw() semantics, etc.
+	A View is a JS object which has an on-screen representation, draw() semantics, etc.
 	
 	Currently each viewable should point to a single ".element" which is the dom node
 	that it manipulates.
 	
-	Note that you can call Element methods on Viewable and they will be passed down to the elements.
+	Note that you can call Element methods on View and they will be passed down to the elements.
 
 
 */
 
 new Class({
-	name : "Viewable",
-	collection : "Viewables",
+	name : "View",
+	collection : "Views",
 
 
 	defaults : {
@@ -68,7 +68,6 @@ new Class({
 
 		destroy : function() {
 			this.orphan();
-console.warn("destroy");
 			if (this.elements) this.elements.invoke(null, "destroy");
 		},
 
@@ -802,4 +801,4 @@ console.warn("destroy");
 
 
 
-Debuggable.applyTo(Viewable, "Viewable");
+Debuggable.applyTo(View, "View");

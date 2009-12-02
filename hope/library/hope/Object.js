@@ -6,9 +6,11 @@
 //				set fieldName(v){...}
 //			}
 //
-function extend(it, source) {
+function extend(it, source, skipExistingProperties) {
 	if (!source) return it;
 	for (var key in source) {
+		if (skipExistingProperties && it[key] !== undefined) continue;
+		
 		var getter = source.__lookupGetter__(key),
 			setter = source.__lookupSetter__(key)
 		;
@@ -32,12 +34,12 @@ function extend(it, source) {
 	return it;
 }
 
-function extendThis(source) {
-	return extend(this, source);
+function extendThis(source, skipExistingProperties) {
+	return extend(this, source, skipExistingProperties);
 }
 
-function extendPrototype(source) {
-	return extend(this.prototype, source);
+function extendPrototype(source, skipExistingProperties) {
+	return extend(this.prototype, source, skipExistingProperties);
 }
 
 

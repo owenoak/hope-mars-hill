@@ -2,11 +2,8 @@
 ::: Global Todo :::
 :::::::::::::::::::
 
-- go through complete API
-	- everything that is global MUST be completely generically useful
-	- make things 100% consistent:
-		- element and ElementList
-		- array and Array and Iteratable
+
+
 
 ::::::::::::::
 ::: Borken :::
@@ -33,8 +30,6 @@
 	- create the functions with templates?
 	- how do we get scope (eg: calling functions, etc) in there?
 
-- add a property to [Array, NodeList, etc].prototype so we can tell if they are actually arrays
-	- to handle case with absoluteUrl() etc where we want to multiplex for array but not nec. to element.children
 
 - have 'things' space segmented into types,
 	eg:  'package:hope' and 'page:foo'
@@ -64,6 +59,9 @@
 - implement Iterable methods on Array
 - forget the Array prototype thing
 - change ElementList to List subclass
+
+- add a property to [Array, NodeList, etc].prototype so we can tell if they are actually arrays
+	- to handle case with absoluteUrl() etc where we want to multiplex for array but not nec. to element.children
 
 - think about data objects which update via XML/JSON
 	and corresponding view objects which want to redraw

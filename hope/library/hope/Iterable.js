@@ -1,5 +1,3 @@
-/* TODO: properties for list being unique, compacted? */
-
 /** Methods for iterating over things (don't have to be arrays). 
 	This will work on any object.
 	To do some funky storage, implement setItem and clearItem.

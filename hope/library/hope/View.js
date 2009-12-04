@@ -490,4 +490,4 @@ new Class({
 
 
 
-Debuggable.applyTo(View, "View");
+Debuggable.mixinTo(View, "View");

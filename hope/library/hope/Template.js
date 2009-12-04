@@ -173,7 +173,7 @@ new Class({
 
 });
 
-Debuggable.applyTo(Template);
+Debuggable.mixinTo(Template);
 
 Loader.makeLoadable({
 	type:"Template",

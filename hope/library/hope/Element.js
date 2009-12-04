@@ -8,8 +8,8 @@
 */
 
 // make Element and elements debuggable
-Debuggable.applyTo(Element, "Element");
-Debuggable.applyTo(Element.prototype, "element");
+Debuggable.mixinTo(Element, "Element");
+Debuggable.mixinTo(Element.prototype, "element");
 
 // assign "head" tag to document (similar to document.body)
 document.head = document.querySelector("HEAD") || document.querySelector("HTML");
@@ -834,7 +834,7 @@ var elementMethods = {
 /*
 		if (skipChildren != true && this.children) {
 			if (object.add) {
-				forEach(this.children, function(child) {
+				Array.forEach(this.children, function(child) {
 					object.add(child.toJS(skipChildren));
 				});
 			} else {

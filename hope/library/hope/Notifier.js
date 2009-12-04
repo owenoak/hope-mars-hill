@@ -10,7 +10,7 @@ window.Notifier = {
 	element : create("div", {id:"Notifier", parent:"BODY"}).hide(),
 	show : function() {
 		// concatenate all arguments together as message to show
-		var msg = map(arguments, function(it){return it}).join(" ");
+		var msg = Array.args(arguments).join(" ");
 		Notifier.element.innerHTML = msg;
 		Notifier.element.fadeIn();
 		setTimeout(Notifier.hide, this.displayDuration);

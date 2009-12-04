@@ -1,15 +1,15 @@
 /** 
-	@name List
-	@mixins Iterable
+	@name Tree
+	@mixesin TreeLike
 	@class 
  */
 new Class({
 	name : "Tree",
-	mixin : "Heirarchical",
+	mixin : "TreeLike",
 	defaults : {
-		initialize : function(properties) {
+		initialize : function(properties, items) {
 			this.asClass(properties);
-			this.initializeTree();
+			if (items) this.setAll(items);
 		}
 	}
 });

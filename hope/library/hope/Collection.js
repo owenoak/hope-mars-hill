@@ -1,67 +1,37 @@
-// ::
-// :: Collections ::
-// ::
-//
-//	A collection is a set of things which is indexed by id 
-//	 AND can be iterated using normal Iterable methods (forEach, etc).
-//
-//	To access items in the collection by id:  	collection.get(id)
-//	To add something to the collection:			collection.add(it [,id])
-//		(if id is not defined, will attempt to use 	(it.id || it.name)
-//			and will skip addition if id cannot be found				)
-//	To get the list of ids in the collection	collection.keys
-//
-//	TODO: 	- add debugging for adding null items to the collection, id not found
-//		 	- setItem() semantics are wacky
-//			- ".name" is not necessarily unique -- safe to add by name?
 
-new Class({
-	name : "Collection",
+/** Super simple class to manage a collection of things.  
+	Use add() and get() to access rather than hitting directly. 
+*/
+function Collection(options) {
+	if (!options) options = Collection.options;
 	
-	defaults : {
-		caseSensitive : true,
-
-		initialize : function(properties) {
-			this.set(properties);
-			this.items = {};
-			this.__defineGetter__("length", function(){return this.keys.length});
-			this.keys = [];
-		},
-
-		add : function(it, key) {
-			if (!it) return;	// TODEBUG
-			
-			if (key == null) key = it.id || it.name;
-			// if no key found or passed, skip the add
-			if (!key) return;	// TODEBUG
+	this._list = [];
 	
-			if (this.caseSensitive == false) key = (""+key).toLowerCase();
-
-			var wasPresent = this.items[key] != undefined;
-			this.items[key] = it;
-	
-			// add to the list of keys (so we can iterate)
-			if (!wasPresent) this.keys.push(key);
-		},
-		
-		get : function(key) {
-			if (this.caseSensitive == false) key = (""+key).toLowerCase();
-			return this.items[key];
-		},
-		
-		
-		// iterator methods
-		item : function(index) {
-			return this.items[this.keys[index]];
-		},
-		
-		setItem : function(key, it) {
-			if (this.caseInsensitive) key = (""+key).toLowerCase();
-			this.items[key] = it;
-		}
+	this.add = function(name, it) {
+		this._list.push(it);
+		this[""+name] = it;
+		if (options.caseSensitive != true) this[(""+name).toLowerCase()] = it;
+		if (options.global) window[name] = it;
 	}
-});
+	
+	this.get = function(name) {
+		if (!name) return;
+		if (typeof name != "string") return name;
+		var it = this[name];
+		if (!it && options.caseSensitive) it = this[name.toLowerCase()];
+		return it;
+	}
+	
+	this.forEach = function(method, context) {
+		return this._list.forEach(method, context);
+	}
+	
+	this.toString = function() {
+		return "[Collection" + (options.name ? " "+options.name : "") + "]";
+	}
+}
 
-// add all Iterator methods to Collections
-Array.makeIterable(Collection);
-
+Collection.options = {
+	global : false,
+	caseSensitive : false
+}

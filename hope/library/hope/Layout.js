@@ -31,8 +31,8 @@ new Class({
 	}
 });
 
-Debuggable.applyTo(Layout, "Layout");
-Debuggable.applyTo(Layout.prototype, "Layout");
+Debuggable.mixinTo(Layout, "Layout");
+Debuggable.mixinTo(Layout.prototype, "Layout");
 
 
 // "flow" layout -- doesn't do anything (eg: lets the browser do the work)

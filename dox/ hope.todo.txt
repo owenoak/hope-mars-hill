@@ -53,6 +53,12 @@
 ::: Array / Iteratable / Tree :::
 :::::::::::::::::::::::::::::::::
 
+- "Iterable" is not the right name -- "ListLike" ?
+- check for new -- constructor?
+- how can we leverage this to iterate over hashes, etc?
+	- have a getList() which iterates through keys and pushes them into a list?
+	- but then adding/removing is busted...
+	
 - test suite for Array/Tree
 - change Heirarchical to "TreeLike"?
 	- have ability to supply separate name for "asTree"
@@ -101,20 +107,17 @@
 ::: Classes :::
 :::::::::::::::
 
+- make it easy to mixinTo from a class
+	- that way we don't have to have ListLike -- just list
+	- also, use setPrototype to make Mixin.Super really be it super?
+	
+- don't like the 'set' paradigm
+- move delay and clearDelay somewhere else
 - classes can have a "registry" [indexed by id()] or a "collection" [linear list]
 	- "IndexedCollection" vs. "Collection" ?
 	
 - we don't remember mixins, so we can't tell where some functions come from...
-- global id:
-	- when an instance of a 'collected' class is instantiated,
-		give it a global id and register it in a registry somewhere
-			(watch for not being able to reclaim anything cause always pointed to!)
-		- hope.instance(globalId) returns pointer to the instance for event handlers, hookups, etc
-		- instance.destroy removes instance from registry
-		- derive id from class?  error if id already exists?
-		- can you provide a globalId manually?
-	- you can have an instance cache just like element.data for getters/setters
-
+- move "makeGloballyAddressable" somewhere else
 - test class creation time
 - test instance instantiation time vs. simple class
 

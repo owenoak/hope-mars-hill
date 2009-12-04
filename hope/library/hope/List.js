@@ -1,17 +1,15 @@
 /** 
 	@name List
-	@mixins Iterable
+	@mixesin ListLike
 	@class 
  */
 new Class({
 	name : "List",
-	mixin : "Iterable",
+	mixin : "ListLike",
 	defaults : {
-		initialize : function() {
-			if (arguments.length > 0) this.setList(arguments);
-		},
-		toString : function() {
-			return "[list]";
+		initialize : function(properties, items) {
+			this.asClass(properties);
+			if (items) this.setAll(items);
 		}
 	}
 });

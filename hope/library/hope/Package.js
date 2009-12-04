@@ -59,7 +59,7 @@ new Class({
 		XMLManifestToJS : function (document) {
 			var object = {
 				name : document.firstChild.getAttribute("name"),
-				files : Array.map(document.querySelectorAll("[url]"),
+				files : Array.forEach(document.querySelectorAll("[url]"),
 								function(entry) {
 									var js = {};
 									Array.forEach(entry.attributes, function(attr) {

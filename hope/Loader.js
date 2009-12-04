@@ -761,10 +761,11 @@ window.Loader = {
 	*/
 	absoluteUrls : function(urls, base) {
 		if (typeof urls == "string") urls = [urls];
-
-		return Array.map(urls, function(url) {
-			return Loader.absoluteUrl(url, base);
+		var results = [];
+		Array.forEach(urls, function(url) {
+			results.push(Loader.absoluteUrl(url, base));
 		});
+		return results;
 	},
 
 
@@ -1055,20 +1056,9 @@ String.prototype.toLocation = function() {
 
 
 // :: Array hack ::
-//	- make sure Array.forEach and Array.map are defined so we can use them below
-if (!Array.forEach) {
-	/** Define Array.forEach if it has not been defined (eg: WebKit). 
-		@see https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Global_Objects/Array/forEach
-	*/
-	Array.forEach = function forEach(list, callback, context) {
-		return Array.prototype.forEach.call(list, callback, context);
-	}
-	/** Define Array.map if it has not been defined (eg: WebKit). 
-		@see https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Global_Objects/Array/map
-	*/
-	Array.map = function map(list, callback, context) {
-		return Array.prototype.map.call(list, callback, context);
-	}
+//	- define Array.forEach so we can use it above
+Array.forEach = function forEach(list, callback, context) {
+	return Array.prototype.forEach.call(list, callback, context);
 }
 
 

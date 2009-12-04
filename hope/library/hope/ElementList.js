@@ -15,13 +15,11 @@
 //				which also adds the methods to NodeList, etc
 
 (function() {
-	new Class({
-		name : "ElementList",
-		Super : Array
-	});
-	
-	ElementList.Methods = {
 
+new Class({
+	name : "ElementList",
+	Super : List,
+	defaults : {
 		// Invoke a named method or function for all sub-elements which match "selector".
 		// If no elements matched selector, returns undefined.
 		// If exactly one element matches selector, returns result of that call.
@@ -30,7 +28,7 @@
 			var list = this.selectAll(selector);
 			if (list.length == 0) {
 				return undefined;
-
+	
 			} else if (list.length == 1) {
 				var it = list[0];
 				method = (method && typeof method == "function" ? method : it[method]);
@@ -50,8 +48,8 @@
 			if (list.length == 0) return false;
 			return this.forEachElement(selector, "hasAttribute", [name]).all();
 		},
-
-
+	
+	
 		//
 		// selector semantics -- get sub-element pieces
 		//
@@ -73,7 +71,7 @@
 			if (this.length) {
 				// if "" or null selector, return the first element
 				if (!selector) return this[0];
-
+	
 				// if a number, return the nth element
 				if (typeof selector == "number") return this[selector];
 	
@@ -92,16 +90,16 @@
 		//  pass selector starting with "*" to do a global search
 		selectAll : function(selector) {
 			if (selector && selector.charAt(0) == "*") return document.selectAll(selector.substr(1));
-
+	
 			var all = new this.constructor();
 			if (this.length) {
 				// if "" or null selector, return all elements
 				if (!selector) return this;
-
+	
 				// if a number, return an array containing the nth element
 				if (typeof selector == "number") {
 					all.push(this[selector]);
-
+	
 				} else {
 					for (var i = 0, element; element = this.elements[i++];) {
 						if (element.matches(selector)) all.push(element);
@@ -140,7 +138,7 @@
 			this.forEachElement(selector, "setAttribute", [name, value]);
 			return this;
 		},
-
+	
 		removeAttribute : function(name, selector) {
 			return this.forEachElement(selector, "removeAttribute", [name]);
 		},
@@ -220,8 +218,8 @@
 			this.forEachElement(selector, "set", [styles]);
 			return this;
 		},
-
-
+	
+	
 		//	
 		//	visible semantics
 		//
@@ -240,13 +238,13 @@
 			this.forEachElement(selector, "show");
 			return this;
 		},
-
+	
 		hide : function hide(selector) {
 			this.forEachElement(selector, "hide");
 			return this;
 		},
 		
-
+	
 		//	
 		//	enable/disable semantics
 		//
@@ -264,7 +262,7 @@
 			return this;
 		},
 		
-
+	
 		//
 		// size and position
 		//
@@ -282,7 +280,7 @@
 			return this;
 		},
 		
-
+	
 		// first parent with relative/absolute positioning
 		offsetParent : function(selector) {
 			return this.forEachElement(selector, "offsetParent");
@@ -384,17 +382,19 @@
 			this.forEachElement(selector, "scrollTo", [left, top]);
 		}
 	
-	};
+	}
+});
+
+
+// ::
+// :: NodeList and NamedNodeMap
+// ::
+
+// add ElementList and array iteration methods to ElementList, NodeList, NamedNodeMap
+extend(NodeList.prototype, ElementList.defaults);
+ListLike.mixinTo(NodeList, {override:false});
+
+extend(NamedNodeMap.prototype, ElementList.defaults);
+ListLike.mixinTo(NamedNodeMap, {override:false});
 	
-	
-	// ::
-	// :: NodeList and NamedNodeMap
-	// ::
-	
-	// add ElementList and array iteration methods to ElementList, NodeList, NamedNodeMap
-	extend(ElementList.prototype, ElementList.Methods);
-	extend(NodeList.prototype, ElementList.Methods);
-	extend(NamedNodeMap.prototype, ElementList.Methods);
-	Array.makeIterable(NodeList, NamedNodeMap);
-	
-})();
+})();	// end hide from global scope

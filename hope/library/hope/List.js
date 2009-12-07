@@ -4,43 +4,6 @@
 	Note that you should NOT assign to the list directly, but rather use add(), remove(), etc
 	 so that the length property is maintained and all notifications are properly sent.
 	
-	The default when this is mixed in is for all functions to work directly on the prototype.
-		eg:		
-			ListLike.mixinTo(SomeClass);
-			var it = new SomeClass();
-			it.add('aValue');
-			it[0] == 'aValue';		<== true
-			it.length = 1;			<== true
-		
-	If you want the class to manage a separate property, eg: this.children, as an array,
-	 call ListLike.mixinTo with 'getList' and 'newList' properties in the options.
-		eg:
-			ListLike.mixinTo(SomeClass, { getList: function(it){return it.children},
-										newList: function(it){return it.children = new List()}
-									  }
-						  );
-			var it = new SomeClass();
-			it.add('aValue');
-			it.children[0] == 'aValue';	<== true
-			it.length == 1;					<== true
-	
-	To have your list ignore null values, pass 'compact:true' in the mixinTo options:
-		eg:
-			ListLike.mixinTo(SomeClass, { compact : true });
-			var it = new SomeClass();
-			it.add(null);
-			it.length == 0;					<== true, because null item was not added
-
-
-	To have your list guarantee that the same item is only added once to the list, 
-	 pass 'unique:true' in the mixinTo options:
-		eg:
-			ListLike.mixinTo(SomeClass, { unique : true });
-			var it = new SomeClass();
-			it.add('aValue');
-			it.add('aValue');
-			it.length == 1;					<== true, because 'aValue' was only added once
-
 
 	TODO:
 			- mixin to array
@@ -59,40 +22,52 @@ new Class({
 
 	defaults : {
 		length : 0,
+
+		compact : new SmartSetter({
+			value : false,
+			set : function(newValue) {
+				if (newValue) {
+					var compacted = this.selectAll(function(it, index){
+						return it != null
+					});
+					this.setTo(compacted);
+				}
+				return newValue;
+			}
+		}),
+		
 	
-		options : new SmartSetter({
-			value : {
-				unique : false,
-				compact : false,
-				topic : "",
-				notify : true
-			},
-			
-			set : function(newValue, defaults) {
-				return extend(newValue || {}, defaults);
+		unique : new SmartSetter({
+			value : false,
+			set : function(newValue) {
+				if (newValue) {
+					var unique = new this.constructor();
+					this.forEach(function(it) {
+						if (!unique.contains(it)) unique.add(it);
+					});
+					this.setTo(unique);
+				}
+				return newValue;
 			}
 		}),
 
 		initialize : function(properties, items) {
 			if (properties) this.extend(properties);
 			if (items) this.setTo(items);
-			this.options = {};
 		},
 
 		/** Set item in the list by index */
 		setItem : function(index, item, notify) {
 			this[index] = item;
 			if (index + 1 > this.length) this.length = index + 1;
-			if (notify != false && this.options.notify) this.notify("set"+this.options.topic, {item:item, index:index});
+			if (notify != false) this.notify("set"+this.topic, {item:item, index:index});
 			return this;
 		},
 
 		/* Set this list to another list. */
 		setTo : function(list, notify) {
-			this.clear();
-			for (var i = 0; i < list.length; i++) {
-				this.setItem(i, list[i], notify);
-			}
+			this.clear(null, notify);
+			this.addList(list, notify);
 			return this;
 		},
 
@@ -113,12 +88,12 @@ new Class({
 				var item = this[index];
 				// if we're dealing with a compact list and we're not clearing the last item
 				//	remove the item instead
-				if (force != true && this.options.compact && index != length -1) {
+				if (force != true && this.compact && index != length -1) {
 					return this.removeItem(index, notify);
 				}
 				delete list[index];
 				if (index == length - 1) this.length = Math.max(0, index);
-				if (notify != false && this.options.notify) this.notify("clear"+this.options.topic, {item:item, index:index});
+				if (notify != false) this.notify("clear"+this.topic, {item:item, index:index});
 			}
 			return this;
 		},
@@ -128,8 +103,8 @@ new Class({
 			@param {Number} [index=end of list] Index of where to put the item.
 		 */
 		add : function add(item, index, notify) {
-			if (this.options.compact && item == null) return this;
-			if (this.options.unique) this.remove(item, false, false);
+			if (this.compact && item == null) return this;
+			if (this.unique) this.remove(item, false, false);
 
 			if (index == null) 	index = this.length;
 
@@ -137,16 +112,17 @@ new Class({
 				this.setItem(i, this[i-1]);
 			}
 			this.setItem(index, item);
-			if (notify != false && this.options.notify) this.notify("add"+this.options.topic, {item:item, index:index});
+			if (notify != false) this.notify("add"+this.topic, {item:item, index:index});
 			return this;
 		},
 		
 		/** Add a list of things to the array at [index]. */
 		addList : function addList(list, index, notify) {
 			if (list == null || !list.length) return;
-			if (index == null) index = this.length;
 			for (var i = 0, length = list.length; i < length; i++) {
-				this.add(list[i], index++, notify);
+				var next = list[i];
+				this.add(next, index, notify);
+				if (index != null && this[index] == next) index++;
 			}
 			return this;
 		},
@@ -170,7 +146,7 @@ new Class({
 				indexes.push(i);
 			}
 			if (indexes.length > 0) {
-				if (notify != false && this.options.notify) this.notify("remove"+this.options.topic, {item:item, indexes:indexes});
+				if (notify != false) this.notify("remove"+this.topic, {item:item, indexes:indexes});
 			}
 			return this;
 		},
@@ -184,7 +160,7 @@ new Class({
 				this.setItem(i, this[i+1], false);
 			}
 			this.clear(this.length-1, false, true);
-			if (notify != false && this.options.notify) this.notify("remove"+this.options.topic, {item:item, indexes:[index]});
+			if (notify != false) this.notify("remove"+this.topic, {item:item, indexes:[index]});
 			return this;
 		},
 
@@ -211,8 +187,8 @@ new Class({
 				indexes.push(i);
 			}
 			if (indexes.length) {
-				if (notify != false && this.options.notify) 
-					this.notify("replace"+this.options.topic, {indexes:indexes, item:newItem, oldItem:oldItem});
+				if (notify != false) 
+					this.notify("replace"+this.topic, {indexes:indexes, item:newItem, oldItem:oldItem});
 			}
 			return this;
 		},
@@ -318,7 +294,7 @@ new Class({
 			} else {
 				List.originalArraySort.call(this);
 			}
-			if (notify != false && this.options.notify) this.notify("sort"+this.options.topic, {list:this});
+			if (notify != false) this.notify("sort"+this.topic, {list:this});
 			return this;
 		},
 	
@@ -459,6 +435,17 @@ new Class({
 			else				return results;
 		},
 
+		/** convert the list to a string, separated by separator. */
+		print : function(separator) {
+			if (this.length == 0) return "";
+			if (separator == null) separator = "";
+			var output = "";
+			for (var i = 0, len = this.length - 1; i < len; i++) {
+				output += this[i] + separator;
+			}
+			output += this[i];
+			return output;
+		},
 		
 		
 		/** Return a named property of each item in the list. */
@@ -491,7 +478,7 @@ new Class({
 		
 		
 		/** Return true if this list equals another list. */
-		equals : function(list) {
+		equals : function equals(list) {
 			if (arguments.length > 1) list = arguments;
 			if (!list) return (this.length == 0);
 			if (this.length != list.length) return false;
@@ -502,15 +489,12 @@ new Class({
 		},
 		
 		
+		
 		//
 		//	debug
 		//
-		print : function() {
-			console.group("Printing list ",this);
-			for (var i = 0; i < this.length; i++) {
-				console.log(this[i]);
-			}
-			console.groupEnd();
+		debug : function() {
+			console.debug(this.print(","));
 		}
 	},
 	

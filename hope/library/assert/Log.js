@@ -9,7 +9,7 @@ function Log(props) {
 	extend(this, props);
 };
 extend(Log.prototype, {
-	console : true,
+	writeToConsole : true,
 	
 	length : 0,
 	
@@ -30,48 +30,48 @@ extend(Log.prototype, {
 	/** Log a message. */
 	log : function() {
 		this._push("log", arguments);
-		if (this.console) this._printItem("log", arguments);
+		if (this.writeToConsole) this._printItem("log", arguments);
 		return this;
 	},
 	
 	/** Log a warning. */
 	success : function() {
 		this._push("success", arguments);
-		if (this.console) this._printItem("success", arguments);
+		if (this.writeToConsole) this._printItem("success", arguments);
 		return this;
 	},
 	
 	/** Log a warning. */
 	warn : function() {
 		this._push("warn", arguments);
-		if (this.console) this._printItem("warn", arguments);
+		if (this.writeToConsole) this._printItem("warn", arguments);
 		return this;
 	},
 	
 	/** Log an error. */
 	error : function() {
 		this._push("error", arguments);
-		if (this.console) this._printItem("error", arguments);
+		if (this.writeToConsole) this._printItem("error", arguments);
 		return this;
 	},
 	
 	/** Start a (nestable) group. */
 	group : function() {
 		this._push("group", arguments);
-		if (this.console) this._printItem("group", arguments);
+		if (this.writeToConsole) this._printItem("group", arguments);
 		return this;
 	},
 	
 	/** End the last group. */
 	groupEnd : function() {
 		this._push("groupEnd", arguments);
-		if (this.console) this._printItem("groupEnd", arguments);
+		if (this.writeToConsole) this._printItem("groupEnd", arguments);
 		return this;
 	},
 	
 	dir : function(it) {
 		this._push("dir", it);
-		if (this.console) this._printItem("dir", arguments);
+		if (this.writeToConsole) this._printItem("dir", arguments);
 	},
 	
 	/** Print the Assert log. */

@@ -371,8 +371,141 @@ Assert({
 		"some - match 0" : function() {
 			var results = list.some(function(it){return it.value == "z"});
 			if (results) Assert.fail();
-		}
+		},
 		
+		
+		//
+		//	unqiueness
+		//
+		"set list.unique = true for empty list" : function() {
+			list.clear();
+			list.unique = true;
+			if (!list.unique) Assert.fail();
+		},
 
+		"add non-unique" : function() {
+			list.add("a");
+			list.add("a");
+			list.add("b");
+			list.add("b");
+			if (!list.equals(["a","b"])) Assert.fail();
+		},
+		
+		"restore list.unique" : function() {
+			list.unique = false;
+			if (list.unique) Assert.fail();
+		},
+		
+		"add non-unique again" : function() {
+			list.add("a");
+			list.add("b");
+			if (!list.equals(["a","b","a","b"])) Assert.fail();
+		},
+
+		"set list.unique = true for non-unique" : function() {
+			list.unique = true;
+			if (!list.unique) Assert.fail();
+			if (!list.equals(["a","b"])) Assert.fail("Didn't remove duplicate items");
+		},
+
+		"addList to unique list" : function() {
+			list.addList(["a","b","c"]);
+			if (!list.equals(["a","b","c"])) Assert.fail("Added items more than once");
+		},
+
+
+		//
+		//	compactness
+		//
+		"set list.compact = true for empty list" : function() {
+			list.unique = false;
+			list.clear();
+			list.compact = true;
+			if (!list.compact) Assert.fail();
+		},
+
+		"add non-compact" : function() {
+			list.add("a");
+			list.add(null);
+			list.add("b");
+			list.add(null);
+			if (!list.equals(["a","b"])) Assert.fail();
+		},
+		
+		"restore list.compact" : function() {
+			list.compact = false;
+			if (list.compact) Assert.fail();
+		},
+		
+		"add non-compact again" : function() {
+			list.add(null);
+			list.add("c");
+			list.add(null);
+			list.add("d");
+			if (!list.equals(["a","b",null,"c",null,"d"])) Assert.fail();
+		},
+
+		"set list.compact = true for non-compact" : function() {
+			list.compact = true;
+			if (!list.compact) Assert.fail();
+			if (!list.equals(["a","b","c","d"])) Assert.fail("Didn't remove null items");
+		},
+
+		"addList to compact list" : function() {
+			list.addList([null,"e",null,"f",null]);
+			if (!list.equals(["a","b","c","d","e","f"])) Assert.fail("Added items more than once");
+		},
+
+		
+		//
+		//	compact and unique
+		//
+		"set compact and unique" : function() {
+			list.clear();
+			list.unique = true;
+			list.compact = true;
+			if (!list.compact) Assert.fail();
+			if (!list.unique) Assert.fail();
+		},
+
+		"add non-unique and non-compact" : function() {
+			list.add("a");
+			list.add(null);
+			list.add("b");
+			list.add(null);
+			list.add("a");
+			list.add(null);
+			list.add("b");
+			list.add(null);
+			if (!list.equals(["a","b"])) Assert.fail();
+		},
+		
+		"restore list.compact and unique" : function() {
+			list.compact = false;
+			list.unique = false;
+			if (list.compact) Assert.fail();
+			if (list.unique) Assert.fail();
+		},
+		
+		"add non-compact again again" : function() {
+			list.add("a");
+			list.add("b");
+			list.add(null);
+			list.add("c");
+			list.add(null);
+			list.add("d");
+			if (!list.equals(["a","b","a","b",null,"c",null,"d"])) Assert.fail();
+		},
+
+		"set compact and unique for non-compact" : function() {
+			list.compact = true;
+			list.unique = true;
+			if (!list.equals(["a","b","c","d"])) Assert.fail("Didn't remove duplicate items");
+		},
+
+		"addList to compact list again" : function() {
+			list.addList(["a",null,"e",null,"f",null]);
+			if (!list.equals(["b","c","d","a","e","f"])) Assert.fail("Added items more than once");
+		},
 	}
 });

@@ -25,9 +25,6 @@ SmartSetter.prototype = new Descriptor({
 			return defaultValue;
 		}
 		function smartSetter(newValue) {
-			// remember the original value, because deleting assignee[key] below may clear it
-			var oldValue = this[key];
-			
 			// special case: 
 			//	if we're assigning directly to 'assignee', 
 			//	   just update the defaultValue
@@ -36,17 +33,27 @@ SmartSetter.prototype = new Descriptor({
 				return defaultValue;
 			}
 			
+			// remember the original value, because deleting assignee[key] below may clear it
+			var oldValue = this[key];
+
 			// clear the getter and setter on the original object
 			delete assignee[key];
+			// clear the getter and setter on this -- we will replace with getter/setter below
+			delete this[key];
 			
 			// call the actual setter, assigning the results directly to this object
-			var results = setter.call(this, newValue, oldValue);
-			this[key] = results;
+			var error;
+			try {
+				results = setter.call(this, newValue, oldValue);
+				this.__defineGetter__(key, function(){ return results });
+				this.__defineSetter__(key, smartSetter);
+			} catch (error) {};
 			
 			// now set up the getter and setter again on the assignee
 			assignee.__defineSetter__(key, smartSetter);
 			assignee.__defineGetter__(key, smartGetter);
 			
+			if (error) throw error;
 			// and return the results
 			return results;
 		}

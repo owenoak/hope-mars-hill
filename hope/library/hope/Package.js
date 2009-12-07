@@ -13,7 +13,7 @@ new Class({
 		name : undefined,
 
 		initialize : function(properties) {
-			this.set(properties);
+			this.extend(properties);
 			var packageName = "package:"+this.name;
 
 			// remember the path to this package
@@ -37,7 +37,7 @@ new Class({
 		//		- if it has files, load those and create the package when done
 		//		- if no files, create the package immediately
 		load : function loadPackage(url, callback, errback, xml) {
-			Loader._debug("loadPackage(",url,"): beginning load");
+			Loader._warn("loadPackage(",url,"): beginning package load");
 			if (!xml) xml = Loader.loadXML(url, false);
 			var props = Package.XMLManifestToJS(xml);
 			props.xml = xml;
@@ -45,8 +45,8 @@ new Class({
 
 			function makePackage() {
 				var pkg = new Package(props);
-				if (callback) callback();
 				Loader._debug("loadPackage(",url,"): package load completed");
+				if (callback) callback();
 			}
 
 			var files = Loader.absoluteUrls(props.files, url.toLocation().fullpath);
@@ -59,16 +59,18 @@ new Class({
 		XMLManifestToJS : function (document) {
 			var object = {
 				name : document.firstChild.getAttribute("name"),
-				files : Array.forEach(document.querySelectorAll("[url]"),
-								function(entry) {
-									var js = {};
-									Array.forEach(entry.attributes, function(attr) {
-										js[attr.name] = attr.value;
-									});
-									return js;
-								}
-							)
-			}
+				files : []
+			};
+			
+			Array.forEach(document.querySelectorAll("[url]"),
+				function(entry) {
+					var js = {};
+					Array.forEach(entry.attributes, function(attr) {
+						js[attr.name] = attr.value;
+					});
+					object.files.push(js);
+				}
+			);
 			return object;
 		}
 	}

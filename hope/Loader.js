@@ -25,7 +25,7 @@
 	@exports window.Loader as Loader
 */
 window.Loader = {
-
+	id : "Loader",
 	loaderCacheFileName	: "hope.js",	// name of this file if loaded from a cached (smooshed) file
 	loaderUrl : undefined,				// url of the loader (set in initialize() )
 	useCache : false,			// if true, we try to pull package (and other) files from the cache
@@ -776,7 +776,7 @@ window.Loader = {
 		var cookies = document.cookie.split(/\s*;\s*/);
 		for (var i = 0, len = cookies.length; i < len; i++) {
 			var cookie = cookies[i].split("=");
-			if (cookie[0] == key) return cookies[i].substr(key.length);
+			if (cookie[0] == key) return cookies[i].substr(key.length+1);
 		}
 	},
 

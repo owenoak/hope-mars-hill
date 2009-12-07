@@ -86,7 +86,7 @@
 			return this.classDefaults;
 		},
 
-		asMixin : Class.makeSuperCaller(Mixin, true),
+		asMixin : Class.makeSuperCaller(Mixin.prototype),
 		
 		toString : function() {
 			return "[Mixin "+this.name+"]";
@@ -96,7 +96,11 @@
 
 	/** Registry of all mixins.
 		Use  Mixins.get(name)  to return a reference to a mixin. */
-	window.Mixins = new Collection({global:true, caseSensitive:false, name:"Mixins"});
+	window.Mixins = new Collection({
+		name:"Mixins",
+		global:true, 
+		caseSensitive:false
+	});
 	Mixins.add("Mixin", Mixin);
 
 })();

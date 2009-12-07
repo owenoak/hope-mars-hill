@@ -7,14 +7,14 @@ function Collection(options) {
 	
 	this._list = [];
 	
-	this.add = function(name, it) {
+	this.add = options.add || function(name, it) {
 		this._list.push(it);
 		this[""+name] = it;
 		if (options.caseSensitive != true) this[(""+name).toLowerCase()] = it;
 		if (options.global) window[name] = it;
 	}
 	
-	this.get = function(name) {
+	this.get = options.get || function(name) {
 		if (!name) return;
 		if (typeof name != "string") return name;
 		var it = this[name];

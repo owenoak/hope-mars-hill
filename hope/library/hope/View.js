@@ -63,7 +63,7 @@ new Class({
 		initialize : function initialize(attributes) {
 			this.elements = new ElementList();
 			this.set(attributes);
-			this.makeGloballyAddressable();
+			View.globalize(this);
 			if (this.autoDraw) this.draw();
 		},
 
@@ -201,7 +201,7 @@ new Class({
 
 		// set our children to an array of children
 		setChildren : function(children) {
-			this.empty();
+			this.clearAll();
 			if (children) this.addList(children);
 			return this;
 		},
@@ -471,14 +471,17 @@ new Class({
 			return output;
 		},
 		
-		set selectableText(selectable) {
-			this.selectableText = (selectable = selectable != false);
-
-			if (selectable) {
-				this.elements.removeAttribute("selectable");
-			} else {
-				this.elements.addAttribute("selectable", "false");
-			}
+		selectableText : new Descriptor({
+				set : function(selectable) {
+					this.selectableText = (selectable = selectable != false);
+		
+					if (selectable) {
+						this.elements.removeAttribute("selectable");
+					} else {
+						this.elements.addAttribute("selectable", "false");
+					}
+				}
+			})
 		}
 
 	},

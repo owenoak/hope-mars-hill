@@ -26,6 +26,13 @@
 		stringizeTarget : false,		// if true, we make targe a string in debug messages
 		logs : {},						// map of topic -> log message
 		levels : {},					// map of topic -> log level
+
+		initialize : function() {
+			
+
+			// make the Loader debuggable
+			Debuggable.mixinTo(Loader, "Loader");
+		},
 		
 		// if true, we log debug messages even if topic is not in debug mode
 		logAllDebugs : (Loader.getCookie("debug-logAllDebugs") == "true"),
@@ -85,14 +92,16 @@
 
 			// set the initial debug level from a cookie
 			Debug.levels[topic] = parseInt(Loader.getCookie("debug-"+topic) || OFF);
-	
+
 			var debugMethods = {
 				_debug : function _debug() {
 					if (Debug.levels[topic] < DEBUG && !Debug.logAllDebugs) return;
 					var args = combineArgs(DEBUG_STRING, this, arguments);
 					debugLog[debugLog.length] = args;
 					// if debugging, write to window.status
-					if (Debug.levels[topic] >= DEBUG) window.status = args.slice(1).join(" ");
+//					if (Debug.levels[topic] >= DEBUG) window.status = args.slice(1).join(" ");
+					// if debugging, write to console
+					if (Debug.levels[topic] >= DEBUG) console.debug.apply(console, args.slice(1));
 				},
 				
 				_warn : function _warn() {
@@ -140,5 +149,5 @@
 	
 })();		// End Debuggable mixin
 
-// make the Loader debuggable
-Debuggable.mixinTo(Loader, "Loader");
+
+Debug.initialize();

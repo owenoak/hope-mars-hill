@@ -9,7 +9,7 @@ new Class({
 	defaults : {
 		initialize : function(properties, items) {
 			this.asClass(properties);
-			if (items) this.setAll(items);
+			if (items) this.setTo(items);
 		}
 	}
 });

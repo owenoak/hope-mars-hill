@@ -384,17 +384,5 @@ new Class({
 	
 	}
 });
-
-
-// ::
-// :: NodeList and NamedNodeMap
-// ::
-
-// add ElementList and array iteration methods to ElementList, NodeList, NamedNodeMap
-extend(NodeList.prototype, ElementList.defaults);
-ListLike.mixinTo(NodeList, {override:false});
-
-extend(NamedNodeMap.prototype, ElementList.defaults);
-ListLike.mixinTo(NamedNodeMap, {override:false});
 	
 })();	// end hide from global scope

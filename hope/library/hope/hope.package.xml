@@ -7,6 +7,7 @@
 		<script url="hope.js" preload="true" />
 
 		<script url="Object.js" preload="true" />
+		<script url="Object-setters.js" preload="true" />
 		<script url="Function.js" preload="true" />
 		<script url="String.js" preload="true" />
 		<script url="Boolean.js" preload="true" />
@@ -24,18 +25,30 @@
 		<script url="Debuggable.js" preload="true" />
 		<script url="Observable.js" preload="true" />
 
+		<script url="Package.js" preload="true" />
+
+		<script url="List.js" preload="true" />
+		<script url="Array.js" preload="true" />
+
+<!--
+
 		<script url="ListLike.js" preload="true" />
 		<script url="TreeLike.js" preload="true" />
-		<script url="List.js" preload="true" />
 		<script url="Tree.js" preload="true" />
 
-		<script url="Array.js" preload="true" />
+
+		<script url="List2.js" preload="true" />
+		<script url="Tree2.js" preload="true" />
+
 
 
 		<script url="XMLClass.js" preload="true" />
 
 		<script url="Event.js" preload="true" />
 		<script url="Element.js" preload="true" />
+		<script url="ElementList.js" preload="true" />
+		<script url="NodeList.js" preload="true" />
+		<script url="NamedNodeMap.js" preload="true" />
 		<script url="ElementList.js" preload="true" />
 		<script url="Document.js" preload="true" />
 		<script url="Element-data.js" preload="true" />
@@ -47,9 +60,6 @@
 		<script url="Layout.js" preload="true" />
 
 
-		<script url="Package.js" preload="true" />
-
-
 		<script url="Stylesheet.js" preload="true" />
 		<script url="JSON.js" preload="true" />
 		<script url="Template.js" preload="true" />
@@ -58,5 +68,6 @@
 
 
 		<script url="Notifier.js" Xpreload="true" />
+-->
 	</files>
 </package>

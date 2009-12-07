@@ -48,7 +48,7 @@
 
 		// if there are any mixins, add them now BEFORE defaults are added to the class
 		if (properties.mixin) {
-			properties.mixin.split(",").forEach(function(mixin) {
+			properties.mixin.split(/\s*,\s*/).forEach(function(mixin) {
 				if (typeof mixin == "string") mixin = window[mixin];
 				mixin.mixinTo(constructor);
 			});
@@ -78,15 +78,17 @@
 
 	// return a function to call a method on the constructor as this class
 	Class.makeSuperCaller = function makeSuperCaller(context) {
-		return function callAs() {
+		function callAs() {
 			var methodName = callAs.caller.name || callAs.caller._name;
 			if (!methodName) throw 'In order to call superclass methods in this way, function must have a name';
 			var method = context[methodName];
-//console.group("Calling ",methodName," on ",context, " from ", callAs.caller);
+//console.group("Calling ",methodName," on "+context, " from ", callAs.caller);
 //console.log(method+"");
 //console.groupEnd();
 			if (method) return method.apply(this, arguments);
-		}		
+		}
+		callAs.context = context;
+		return callAs;
 	}
 
 	// properties/methods available to all Classes (constructors)
@@ -98,7 +100,7 @@
 		//	if instance.globalId is already present, uses that
 		//	if instance.globalId is NOT already present, generates one based on constructor.ClassName
 		//	also assigns instance.globalRef as a string that can be eval()d to point back to the instance
-		makeGloballyAddressable : function makeGloballyAddressable(instance) {
+		globalize : function globalize(instance) {
 			// make sure there is a Collection object assigned globally
 			if (!this.Collection) {
 				if (!this.collection) this.collection = this.ClassName + "s";
@@ -131,7 +133,7 @@
 		extend : extendPrototype,
 		extendClass : extendThis,
 		toString : function toString() {
-			return "[Class "+this.ClassName+"]";
+			return "["+this.ClassName+"]";
 		}
 
 	});
@@ -139,34 +141,13 @@
 	// properties/methods applied to all SubClass instances
 	Class.prototype = {
 		initialize : function initialize(properties){
-			this.set(properties);
+			this.extend(properties);
 		},
 
 		asClass : Class.makeSuperCaller(Class.prototype),
-		makeGloballyAddressable : function makeGloballyAddressable() {this.constructor.makeGloballyAddressable(this)},
-
-		toString : function toString() {
-			if (this.globalRef) return "["+this.globalRef+"]";
-			var name = (this == this.constructor.prototype ? "prototype" : this.id || this.name);
-			return "["+this.constructor.ClassName+" "+name +"]";
-		},
 
 		// extend this element with new methods
 		extend : extendThis,
-		set : function set(key, value) {
-			if (arguments.length == 1) {
-				var props = key;
-				for (key in props) {
-					this.set(key, props[key]);
-				}
-				return;
-			}
-			var setter = Setters[key] || (Setters[key] = "set"+key.capitalize());
-			if (this[setter]) 	this[setter](value);
-			else				this[key] = value;
-			return this;
-		},
-		
 		
 		//
 		// observe/notify pattern
@@ -212,10 +193,26 @@
 				clearTimeout(this._timers[timerName]);
 				delete this._timers[timerName];
 			}
-		}
-		
+		},
+
+
+		//
+		//	helpful toString implementation
+		//
+		toString : function toString() {
+			if (this.globalRef) return "["+this.globalRef+"]";
+			var ClassName = this.constructor.ClassName;
+			if (this == this.constructor.prototype) {
+				return "["+ClassName+".prototype]";
+			}
+			
+			var name = this.id || this.name;
+			if (name != null && name != "") {
+				return "["+ClassName+":"+ name + "]";
+			} else {
+				return "[anonymous "+ClassName+"]";
+			}
+		}		
 	}
-	// map of "key" -> "setKey" for setters
-	var Setters = {};
 
 })();

@@ -8,7 +8,7 @@ extend(String.prototype, {
 
 	// use native string.trim if provided
 	trim : String.prototype.trim || function() {
-		return this.replace(/^\s+/, '').replace(/\s+$/, '');
+		return this.match(/^\s*(.*?)\s*$/)[1];
 	},
 
 	capitalize : function() {

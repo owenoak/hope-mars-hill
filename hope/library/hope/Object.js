@@ -1,48 +1,57 @@
 // :: Object extensions ::
-// ==> extend it with source1 and source2 and etc
-//	note: this maps getters and setters automaticaly
-//		you can define them in your source objects as:
-//			{	get fieldName() {...},
-//				set fieldName(v){...}
-//			}
-//
-function extend(it, source, override) {
+
+
+// if override != true, we will skip keys where it.hasOwnProperty(key)
+// if recurse == true, we will recursively extend any object properties of source
+//		NOTE:  do NOT call use recurse with anything other than simple objects
+function extend(it, source, override, recurse) {
 	if (!it || !source) return it;
-
 	override = (override != false);
+	var itsValue, sourceValue, getter, setter;
+	
 	for (var key in source) {
-		if (override != true && it[key] !== undefined) continue;
+		itsValue = it[key];
+		sourceValue = source[key];
 		
-		var getter = source.__lookupGetter__(key),
-			setter = source.__lookupSetter__(key)
-		;
-		if (getter || setter) {
-			if (getter) it.__defineGetter__(key, getter);
-			if (setter) it.__defineSetter__(key, setter);
-		} else {
-			var value = source[key];
-			it[key] = value;
+		if (sourceValue instanceof Descriptor) {
+			Object.defineProperty(it, key, sourceValue);
+			continue;
+		}
 
-			// if we have an anonymous function, assign the key as the '_name'
-			//	this is required for asSuper() calls to work
-			if (typeof value == "function" && !value.name) value._name = key;
+		// if we have an anonymous function, assign the key as the '_name'
+		//	this is required for asSuper() calls to work
+		if (typeof sourceValue == "function" && !sourceValue.name && !sourceValue._name) {
+			sourceValue._name = key;
+		}
+
+		if (recurse == true && sourceValue && typeof sourceValue == "object") {
+			it[key] = extend(itsValue || {}, sourceValue, override, recurse);
+			continue;
+		}
+
+		if (override == false || !it.hasOwnProperty(key)) {
+			it[key] = sourceValue;
 		}
 	}
-	// pick up properties that need to be assigned manually
-// THIS IS BREAKING FOR SIMPLE CLASSES
-//	if (source.toString != it.toString && !it.hasOwnProperty("toString")) 
-//		it.toString = source.toString;
 
 	return it;
 }
 
+// syntactic sugar
+function recursivelyExtend(it, source, override) {
+	return extend(it, source, override, true);
+}
+
+// NOTE: recurse explicitly not allowed here
 function extendThis(source, override) {
 	return extend(this, source, override);
 }
 
+// NOTE: recurse explicitly not allowed here
 function extendPrototype(source, override) {
 	return extend(this.prototype, source, override);
 }
+
 
 
 // set the prototype of one "dest" to "source"
@@ -126,3 +135,4 @@ function uniquePropertiesOf(it) {
 	}
 	return output;
 }
+

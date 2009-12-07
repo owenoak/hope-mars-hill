@@ -3,10 +3,14 @@
 	// add extension methods to Array
 	Array.extend = extendPrototype;
 	Array.extendClass = extendThis;
+	Array.ClassName = "Array";
+	
 	Array.prototype.extend = extendThis;
+	Array.prototype.toString = Class.prototype.toString;
 
-	// add ListLike methods to Array
-	ListLike.mixinTo(Array, {override:false});
+
+	// add List methods to Array
+	List.mixinTo(Array);
 	
 	// make arrays observable
 	Observable.mixinTo(Array);
@@ -15,8 +19,8 @@
 	Array.extend({
 		// override array.prototype.forEach and .sort with our versions
 		//	which is backwards-compatible but add additional goodies
-		forEach : ListLike.defaults.forEach,
-		sort : ListLike.defaults.sort
+		forEach : List.defaults.forEach,
+		sort : List.defaults.sort
 	});
 
 

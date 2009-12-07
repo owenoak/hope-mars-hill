@@ -53,17 +53,13 @@
 ::: Array / Iteratable / Tree :::
 :::::::::::::::::::::::::::::::::
 
-- "Iterable" is not the right name -- "ListLike" ?
-- check for new -- constructor?
+
+- since we have the "compact" sequence, can we get rid of one of "removeItem" and "clearItem" ? 
+
 - how can we leverage this to iterate over hashes, etc?
 	- have a getList() which iterates through keys and pushes them into a list?
 	- but then adding/removing is busted...
 	
-- test suite for Array/Tree
-- change Heirarchical to "TreeLike"?
-	- have ability to supply separate name for "asTree"
-- implement Iterable methods on Array
-- forget the Array prototype thing
 - change ElementList to List subclass
 
 - add a property to [Array, NodeList, etc].prototype so we can tell if they are actually arrays
@@ -155,6 +151,8 @@
 :::::::::::::::::
 ::: Functions :::
 :::::::::::::::::
+
+- change function.bind to   .bind(thisArg, arg1, arg2....)
 
 - check speed of new Function() vs eval() vs jQuery globalEval
 - check debuggability of new Function() vs eval() vs jQuery globalEval
@@ -562,6 +560,12 @@
 	- write some pretty printers
 	- reduce code size?
 - date math stuff
+
+
+- to/from ISO string:
+	- var date = new Date("2009-05-21T16:06:05.000Z");
+	- print( date.toISOString() );		// Prints 2009-05-21T16:06:05.000Z
+
 
 :::::::::::::::::::::
 ::: Compatibility :::

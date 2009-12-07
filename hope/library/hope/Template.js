@@ -17,7 +17,7 @@ new Class({
 				this.set(props);
 				if (text) this.text = text;
 			}
-			this.makeGloballyAddressable();
+			Template.globalize(this);
 		},
 
 		// the first time the Template is expanded

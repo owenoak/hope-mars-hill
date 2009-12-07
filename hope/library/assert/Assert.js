@@ -13,7 +13,7 @@
 function Assert(suite, whenDone) {
 	if (!suite.name) return Assert.log.error("Assert(",suite,"): suite must contain a 'name' with name of test suite.");
 
-	Assert.Suites[name] = suite;
+	Assert.Suites[suite.name] = suite;
 
 	suite.succeeded = 0;
 	suite.failed = 0;
@@ -21,13 +21,13 @@ function Assert(suite, whenDone) {
 
 
 	Assert.log.group("Suite "+suite.name);
-	if (suite.setup) {
+	if (suite.start) {
 		try {
-			suite.setup();
+			suite.start();
 		} catch (e) {
-			Assert.log.error("Error executing setup: ", e);
+			Assert.log.error("Error executing start: ", e);
 			suite.failed++;
-			suite.fails.push("setup");
+			suite.fails.push("start");
 		}
 	}
 	
@@ -46,13 +46,13 @@ function Assert(suite, whenDone) {
 		}
 	}
 	
-	if (suite.cleanup) {
+	if (suite.end) {
 		try {
-			suite.cleanup();
+			suite.end();
 		} catch (e) {
-			Assert.log.error("Error executing cleanup: ", e);
+			Assert.log.error("Error executing end: ", e);
 			suite.failed++;
-			suite.fails.push("cleanup");
+			suite.fails.push("end");
 		}
 	}
 

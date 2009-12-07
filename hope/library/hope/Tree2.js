@@ -3,10 +3,9 @@
 		
 */
 
-new Mixin({
-	name : "TreeLike",
-	Super : "ListLike",
-	callAs : "asTree",
+new Class({
+	name : "Tree2",
+	Super : "List2",
 	
 	options : extend({}, ListLike.options),
 
@@ -17,6 +16,8 @@ new Mixin({
 	},
 	
 	defaults : {
+		options : extend({}, List.prototype.options),
+
 		// if the child's parent is changing, reassign the parent
 		setItem : function(index, child, notify) {
 			if (child && child.parent != this && child.setParent) child.setParent(this);
@@ -126,3 +127,6 @@ new Mixin({
 
 });
 
+
+// set Tree up as a mixin
+Mixins.add("Tree", Tree);

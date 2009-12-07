@@ -18,7 +18,8 @@ function Assert(suite, whenDone) {
 	suite.succeeded = 0;
 	suite.failed = 0;
 	suite.fails = [];
-
+	
+	var startTime = new Date();
 
 	Assert.log.group("Suite "+suite.name);
 	if (suite.start) {
@@ -56,23 +57,30 @@ function Assert(suite, whenDone) {
 		}
 	}
 
+	var runTime = (new Date() - startTime);
 	Assert.log.groupEnd();
 	if (suite.failed) {
 		suite.success = false;
 		Assert.Failed.push(suite);
 		Assert.success = false;
-		Assert.log.error("Suite failed! ("+suite.succeeded+" tests succeeded"+", "
-							+suite.failed," tests failed).  Failures:", suite.fails);
+		Assert.log.error("Suite '",suite.name,"' failed! (",suite.succeeded," tests succeeded"+", "
+							,suite.failed," tests failed, time: ",runTime," msec).\nFailures:", suite.fails);
 	} else {
 		suite.success = true;
 		Assert.Succeeded.push(suite);
-		Assert.log.success("Suite succeeded! ("+suite.succeeded+" tests succeeded"+")");
+		Assert.log.success("Suite '",suite.name,"' succeeded! (",suite.succeeded," tests succeeded, time: ",runTime," msec)");
 	}
+
+	// print all of the messages to the console at the end so we get an accurate time
+	Assert.log.print();
+	Assert.log.clear();
 
 	if (Assert.next) Assert.next();
 }
 
-Assert.log = new Log();
+Assert.log = new Log({
+	writeToConsole:false
+});
 
 extend(Assert, {
 	/** Overall success or failure of ALL suites. */
